@@ -62,7 +62,7 @@ class AddAssignment(FlaskForm):
     assignmenttitle = StringField('assignmenttitle', validators=[DataRequired()])
     assignmentdescription = TextAreaField('assignmentdescription',validators=[DataRequired()])
     duedate = DateField('due_date', format='%Y-%m-%d', validators=[DataRequired()])
-    
+    attachment = FileField('Attachment')
     # Add the QuerySelectField to select the class
     class_id = SelectField('Class', coerce=int)  
     

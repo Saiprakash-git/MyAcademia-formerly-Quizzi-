@@ -30,6 +30,10 @@
                     <h5 class="card-title">{{assignment.title}}</h5>
                     <p class="card-text">{{assignment.description}} </p>
                     <p class="card-text"> Due : {{assignment.due_date }}</p>
+                    {% if assignment.attachment %}
+    <p><a href="{{ url_for('download_attachment', filename=assignment.attachment) }}">Download Attachment</a></p>
+{% endif %}
+                
                 </div>
             </div>
         {% endfor %}

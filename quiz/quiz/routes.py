@@ -1,10 +1,12 @@
 from quiz import app, db , bcrypt
-from flask import Flask , render_template, redirect, url_for, request, session, flash
+from flask import Flask , render_template, redirect, url_for, request, session, flash, current_app
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
 from quiz.models import User, Class , Assignment
 import random, string 
+from werkzeug.utils import secure_filename
+import os
 
 app_ctx = app.app_context()
 
@@ -135,31 +137,41 @@ def join_class():
             return redirect(url_for('home'))
         return render_template('joinclass.html',form=form)
 
-@app.route('/classinfo/Add_Assignment', methods=['GET', 'POST'])
+@app.route('/add_assignment', methods=['GET', 'POST'])
 @login_required
 def add_assignment():
-   
     user_classes = Class.query.filter_by(user_id=current_user.id).all()
-
-    form = AddAssignment()  # Instantiate the form outside the request.method condition
+    form = AddAssignment()
     form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            assignment = Assignment(
-                title=form.assignmenttitle.data,
-                description=form.assignmentdescription.data,
-                due_date=form.duedate.data,
-                class_id=form.class_id.data,  # Use the selected class id from the form
-                creator_id=current_user.id
-            )
-            db.session.add(assignment)
-            db.session.commit()
-            flash('Assignment has been assigned', 'success') 
-            return redirect(url_for('class_info', classid=form.class_id.data))
+    
+    if form.validate_on_submit():
+        title = form.assignmenttitle.data
+        description = form.assignmentdescription.data
+        due_date = form.duedate.data
+        attachment = form.attachment.data  # Uploaded file
+        class_id = form.class_id.data
+        attachment_path = 0
+        # Save the file
+        if attachment:
+            filename = secure_filename(attachment.filename)
+            attachment_path = os.path.join(current_app.root_path, 'static/uploads', filename)
+            attachment.save(attachment_path)
+        
+        # Create and save the assignment
+        assignment = Assignment(title=title, description=description, due_date=due_date,class_id=class_id, creator_id=current_user.id, file_attachment=attachment_path)
+        db.session.add(assignment)
+        db.session.commit()
+        
+        flash('Assignment created successfully!', 'success')
+        return redirect(url_for('class_info', classid=form.class_id.data))
     
     return render_template('addassignment.html', form=form, user_classes=user_classes)
   # Redirect to the first class's info
+from flask import send_file
+
+@app.route('/download_attachment/<filename>')
+def download_attachment(filename):
+    return send_file(filename, as_attachment=True)
 
 @app.route('/account')
 @login_required
