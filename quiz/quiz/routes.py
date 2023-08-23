@@ -1,5 +1,5 @@
 from quiz import app, db , bcrypt
-from flask import Flask , render_template, redirect, url_for, request, session, flash, current_app
+from flask import Flask , render_template, redirect, url_for, request, session, flash, current_app, request 
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
@@ -150,14 +150,16 @@ def add_assignment():
         due_date = form.duedate.data
         attachment = form.attachment.data  # Uploaded file
         class_id = form.class_id.data
-        attachment_path = 0
-        # Save the file
-        if attachment:
+        attachment = request.files.get('attachment')  # Get the uploaded fil
+        attachment_path = 0 # Initialize attachment path
+
+        if attachment:  # Check if a file was uploaded
+            
             filename = secure_filename(attachment.filename)
             attachment_path = os.path.join(current_app.root_path, 'static/uploads', filename)
-            attachment.save(attachment_path)
-        
-        # Create and save the assignment
+            attachment.save(attachment_path)  # Save the file
+
+            # Create and save the assignment
         assignment = Assignment(title=title, description=description, due_date=due_date,class_id=class_id, creator_id=current_user.id, file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()

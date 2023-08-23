@@ -25,7 +25,7 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="form-group">
+        <form method="POST" enctype="multipart/form-data">
             {{ form.attachment.label() }}
             {{ form.attachment(class="form-control-file") }}
             {% if form.attachment.errors %}
@@ -33,7 +33,7 @@
                     <span class="text-danger">{{ error }}</span></br>
                 {% endfor %}
             {% endif %}
-        </div>
+        </form>
         
         <button type="submit" class="btn btn-primary">{{ form.submit }}</button>
     </form>
