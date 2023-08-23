@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% if user.role == 'teacher' %}
+<form method="post" action="{{ url_for('add_class') }}">
+    <button type="submit" class="btn btn-primary">Create Class</button>
+</form>
+{% endif %}
+{% if user.role == 'student' %}
+<form method="POST" action="{{ url_for('join_class') }}">
+    <button type="submit" class="btn btn-primary">Join Class</button>
+</form>
+{% endif %}
+
+
+    {% for classs in classes %}
+
+        <div class="container mt-4">
+            <div class="col-md-4">
+                <div class="d-flex flex-row flex-nowrap">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4><a href="{{url_for('class_info',classid=classs.id)}}"  style="color: black;">{{ classs.class_name }}</a></h4>
+                            <p class="card-text">{{ classs.class_code }} </p>
+                            <a href="#" class="btn btn-primary">Go to Class</a>
+                        </div>
+                        <div class="card-footer text-muted">
+                            powered by ASP.co
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% endfor %}
+
+   
+
+{% endblock %}

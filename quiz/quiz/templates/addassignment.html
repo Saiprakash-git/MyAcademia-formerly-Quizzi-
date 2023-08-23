@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Add Assignment</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="title">Title:</label>
+            {{ form.assignmenttitle(class="form-control", placeholder="Enter assignment title") }}
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            {{ form.assignmentdescription(class="form-control", placeholder="Enter assignment description") }}
+        </div>
+        <div class="form-group">
+            <label for="due_date">Due Date:</label>
+            {{ form.duedate(class="form-control") }}
+        </div>  
+        <div class="form-group">
+            <label for="class_id">Select Class:</label>
+            <select class="form-control" id="class_id" name="class_id">
+                {% for class_ in user_classes %}
+                    
+                    <option value="{{ class_.id }}"><input type="checkbox" value="">{{ class_.class_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        
+        <button type="submit" class="btn btn-primary">{{ form.submit }}</button>
+    </form>
+</div>
+{% endblock %}
