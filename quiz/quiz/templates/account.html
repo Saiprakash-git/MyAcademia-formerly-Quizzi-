@@ -1,40 +1,81 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<h2>Account Information</h2>
-        <h4> {{ current_user.username }}!</h4>
-        
-        <div class="account-info">
-            
-            <p><strong>Username:</strong> {{ current_user.username }}</p>
-            <p><strong>Email:</strong> {{ current_user.email }}</p>
-            <p><strong>Role:</strong> {{ current_user.role }}</p>
+    <div class="content-section">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ image_file }}">
+        <div class="media-body">
+          <h2 class="account-heading">{{ current_user.username }}</h2>
+          <p class="text-secondary">{{ current_user.email }}</p>
+          <p class="text-secondary">{{ current_user.role }}-{{current_user.pin}}</p>
         </div>
-        
-        <div class="additional-options">
-            
-            <h2>Additional Options</h2>
-            
-            <div class="container mt-4">
-                <div class="row justify-content-end">
-                    <div class="col-auto">
-                        <a class="btn btn-primary" href="{{url_for('update_account')}}">Update Account?</a>
-                    </div>
-                </div>
-            </div>
-            
-            {% if current_user.role == 'teacher' %}
-                <p><a href="{{ url_for('add_assignment') }}">Create Assignment</a></p>
-                <p><a href="#">Manage Classes</a></p>
-            {% endif %}
-            <!-- Add more role-specific options here -->
-        </div>
-    </main>
-    
-    <footer>
-        Created and Managed by ASP.co
-    </footer>
-    
-    <!-- Include your JavaScript scripts here -->
+      </div>
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Account Update Form</legend>
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
 
-    {% endblock  %}
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.pin.label(class="form-control-label") }}
+                    {% if form.pin.errors %}
+                        {{ form.pin(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.pin.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.pin(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.role.label(class="form-control-label") }}
+                    {% if form.role.errors %}
+                        <div class="form-select">
+                        <option selected disabled value="">Choose...
+                        {{ form.role(class="form-control form-control-lg is-invalid") }}
+                        </option>
+                        </div>
+                        <div class="invalid-feedback">
+                            {% for error in form.role.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.role(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+               
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock content %}

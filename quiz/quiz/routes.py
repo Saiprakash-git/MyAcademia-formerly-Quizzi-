@@ -105,11 +105,6 @@ def class_info(classid):
     if classinfo:
         return render_template('classinfo.html',classinfo=classinfo, current_user=current_user, assignments=assignments,userassigns=userassigns)
 
-@app.route('/student/classrooms')
-@login_required
-def student_classrooms():
-    enrolled_classes = current_user.enrolled_classes
-    return render_template('student/classrooms.html', enrolled_classes=enrolled_classes)
 
 @app.route("/student/joinclass", methods=['GET','POST'])
 @login_required
@@ -188,18 +183,30 @@ def delete_assignment(assignment_id):
     db.session.delete(assignment)
     db.session.commit()
     return redirect(url_for('class_info',classid=classid))
-@app.route('/account')
+
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account(): 
-    return render_template('account.html',current_user=current_user)
+    if current_user.role == 'teacher':
+        image_file = url_for('static', filename='profiles/' + 'teacher_logo.jpg')
+    if current_user.role == 'student':
+        image_file = url_for('static', filename='profiles/' + 'student_logo.jpeg')
+    form = UpdateAccount() 
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.pin = form.pin.data
+        current_user.role = form.role.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    return render_template('account.html',current_user=current_user, image_file=image_file, form=form)
 
-@app.route('/account/update_account')
-@login_required
-def update_account(): 
-    form = update_account() 
+
     
-
-    return 
 
 
 # Push the context onto the stack

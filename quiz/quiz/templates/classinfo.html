@@ -67,7 +67,7 @@
                 {% for assignment in userassigns %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title">{{assignment.title}}</h5>
+                            <a href="{{url_for('assignment_details',assignment_id=assignment.id)}}">{{ assignment.title}}</a>
                             <p class="card-text">{{assignment.description}} </p>
                             <p class="card-text"> Due : {{assignment.due_date }}</p>
                         </div>

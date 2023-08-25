@@ -21,7 +21,32 @@
                 <div class="d-flex flex-row flex-nowrap">
                     <div class="card">
                         <div class="card-body">
-                            <h4><a href="{{url_for('class_info',classid=classs.id)}}"  style="color: black;">{{ classs.class_name }}</a></h4>
+
+                            <tr>
+                                <td>
+                                  <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>
+                                </td>
+                                <td>
+                                  <div class="dropdown" style="display: inline-block;">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: white;">
+                                        &vellip; <!-- Three dots entity -->
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                      <a class="dropdown-item" href="{{ url_for('class_info', classid=classs.id) }}">View Details</a>
+                                      <a class="dropdown-item delete-class" data-classid="{{ classs.id }}" href="#">Delete</a>
+                                      <!-- Add more options as needed -->
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                              
+
+
+
+
+
+
+
                             <p class="card-text">{{ classs.class_code }} </p>
                             <a href="#" class="btn btn-primary">Go to Class</a>
                         </div>

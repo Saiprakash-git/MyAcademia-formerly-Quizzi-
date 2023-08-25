@@ -74,13 +74,24 @@ class UpdateAccount(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     pin = StringField('Pin',validators=[DataRequired(), Length(min=10,max=12)])
-    role = SelectField('Role', choices=[('choose', 'Choose...'),('teacher', 'Teacher'), ('student', 'Student')])
+    role = SelectField('Role', choices=[('teacher', 'Teacher'), ('student', 'Student')])
     submit = SubmitField('Update')
 
     def validate_username(self, username):
-        if username.data != current_user.username:
-            user = User.query.filter_by(username=username.data).first()
-            if user:
-                raise ValidationError('That username is taken. Please choose a different one.')
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('That username is taken. Please choose a different one.')
+        elif  username.data.isalnum(): 
+            raise ValidationError('Username should be alphanumeric (e.g., username@21001CS073)')
+
+    def validate_pin(self, pin):
+        user = User.query.filter_by(pin=pin.data).first()
+        if user:
+            raise ValidationError('User already exists with this PIN.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('That email is taken. Please choose a different one.')
 # class Account(FlaskForm): 
     

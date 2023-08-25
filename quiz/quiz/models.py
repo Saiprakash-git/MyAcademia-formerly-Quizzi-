@@ -37,7 +37,7 @@ class User(db.Model, UserMixin):
 
     
     def __repr__(self): 
-        return f"User('{self.username}','{self.email}','{self.role}')"
+        return f"User('{self.username}','{self.pin}','{self.email}','{self.role}')"
     
 class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)

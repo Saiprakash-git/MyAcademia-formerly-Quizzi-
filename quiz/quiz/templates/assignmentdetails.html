@@ -7,8 +7,11 @@
     <p>Due Date: {{ assignment.due_date }}</p>
     <p>Class: {{ assignment.class_id }}</p>
     {% if assignment.file_attachment %}
+
+
+    
     <p><a href="{{ url_for('download_attachment', filename=assignment.file_attachment) }}">Download Attachment</a></p>
-      {% if current_user == 'teacher' %}
+      {% if current_user.role == 'teacher' %}
       <a class="btn btn-primary"  href="{{ url_for('delete_assignment',assignment_id=assignment.id) }}"> Delete Assignment</a>
       {% endif %}
     {% endif %} 
