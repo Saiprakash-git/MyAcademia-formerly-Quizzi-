@@ -1,5 +1,5 @@
 from quiz import app, db , bcrypt
-from flask import Flask , render_template, redirect, url_for, request, session, flash, current_app, request 
+from flask import Flask , render_template, redirect, url_for, request, flash, current_app, request, send_from_directory, send_file
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
@@ -143,38 +143,51 @@ def add_assignment():
     user_classes = Class.query.filter_by(user_id=current_user.id).all()
     form = AddAssignment()
     form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
-    
+
     if form.validate_on_submit():
         title = form.assignmenttitle.data
         description = form.assignmentdescription.data
         due_date = form.duedate.data
-        attachment = form.attachment.data  # Uploaded file
         class_id = form.class_id.data
-        attachment = request.files.get('attachment')  # Get the uploaded fil
-        attachment_path = 0 # Initialize attachment path
+        attachment = form.attachment.data  # Get the uploaded file
 
         if attachment:  # Check if a file was uploaded
-            
             filename = secure_filename(attachment.filename)
-            attachment_path = os.path.join(current_app.root_path, 'static/uploads', filename)
+            attachment_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             attachment.save(attachment_path)  # Save the file
 
-            # Create and save the assignment
-        assignment = Assignment(title=title, description=description, due_date=due_date,class_id=class_id, creator_id=current_user.id, file_attachment=attachment_path)
+        assignment = Assignment(title=title, description=description, due_date=due_date,
+                                class_id=class_id, creator_id=current_user.id,
+                                file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()
-        
+
         flash('Assignment created successfully!', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
-    
+
     return render_template('addassignment.html', form=form, user_classes=user_classes)
-  # Redirect to the first class's info
-from flask import send_file
 
-@app.route('/download_attachment/<filename>')
+@app.route('/download_attachment/<filename>', methods=['GET'])
 def download_attachment(filename):
-    return send_file(filename, as_attachment=True)
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    else:
+        # Handle the case where the file does not exist
+        return "File not found", 404
 
+@app.route('/assignment/<int:assignment_id>')
+def assignment_details(assignment_id):
+    assignment = Assignment.query.get_or_404(assignment_id)
+    return render_template('assignmentdetails.html', assignment=assignment, current_user=current_user)
+
+@app.route('/<int:assignment_id>/delete')
+def delete_assignment(assignment_id): 
+    assignment = Assignment.query.get_or_404(assignment_id)
+    classid = assignment.class_id
+    db.session.delete(assignment)
+    db.session.commit()
+    return redirect(url_for('class_info',classid=classid))
 @app.route('/account')
 @login_required
 def account(): 

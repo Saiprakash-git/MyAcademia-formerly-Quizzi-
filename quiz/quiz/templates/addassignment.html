@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2>Add Assignment</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div class="form-group">
             <label for="title">Title:</label>
@@ -20,21 +20,19 @@
             <label for="class_id">Select Class:</label>
             <select class="form-control" id="class_id" name="class_id">
                 {% for class_ in user_classes %}
-                    
                     <option value="{{ class_.id }}">{{ class_.class_name }}</option>
                 {% endfor %}
             </select>
         </div>
-        <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
             {{ form.attachment.label() }}
             {{ form.attachment(class="form-control-file") }}
             {% if form.attachment.errors %}
                 {% for error in form.attachment.errors %}
-                    <span class="text-danger">{{ error }}</span></br>
+                    <span class="text-danger">{{ error }}</span><br>
                 {% endfor %}
             {% endif %}
-        </form>
-        
+        </div>
         <button type="submit" class="btn btn-primary">{{ form.submit }}</button>
     </form>
 </div>
