@@ -1,4 +1,4 @@
-from quiz import app, db , bcrypt
+from quiz import app, db , bcrypt,mail
 from flask import Flask , render_template, redirect, url_for, request, flash, current_app, request, send_from_directory, send_file
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount
 from flask_login import login_user, current_user, logout_user, login_required
@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from quiz.models import User, Class , Assignment
 import random, string 
 from werkzeug.utils import secure_filename
+from quiz.utils import assignment_added_email
 import os
 
 app_ctx = app.app_context()
@@ -156,11 +157,21 @@ def add_assignment():
                                 file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()
-
+        send_email(assignment)
         flash('Assignment created successfully!', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
     return render_template('addassignment.html', form=form, user_classes=user_classes)
+
+def send_email(assignment): 
+        classid = assignment.class_id
+        classs = Class.query.get(classid)
+        users = User.query.all()
+        title = assignment.title
+        msgbody = f'Assignment Added in {classs.class_name} Due-Date:{assignment.due_date}-----------{assignment.description}'
+        for user in users: 
+            if classs in user.classses: 
+                assignment_added_email(user,title=title, msgbody=msgbody)
 
 @app.route('/download_attachment/<filename>', methods=['GET'])
 def download_attachment(filename):
