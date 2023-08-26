@@ -1,9 +1,9 @@
 from quiz import app, db , bcrypt,mail
 from flask import Flask , render_template, redirect, url_for, request, flash, current_app, request, send_from_directory, send_file
-from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount
+from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount, AddQuizForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
-from quiz.models import User, Class , Assignment
+from quiz.models import User, Class , Assignment, Quiz, Question, Option
 import random, string 
 from werkzeug.utils import secure_filename
 from quiz.utils import assignment_added_email
@@ -218,7 +218,41 @@ def account():
 
 
     
+@app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
+@login_required
+def add_quiz():
+    user_classes = Class.query.filter_by(user_id=current_user.id).all()
 
+    form = AddQuizForm()
+    form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
+
+    if request.method == 'POST' and form.validate_on_submit():
+        num_questions = form.num_questions.data  # Get the number of questions from the form
+
+        quiz = Quiz(
+            class_id=form.class_id.data,
+            title=form.title.data,
+            timer=form.timer.data
+        )
+        db.session.add(quiz)
+        db.session.commit()
+
+        for i in range(num_questions):
+            question_text = form.questions[i].data
+            question = Question(quiz_id=quiz.id, text=question_text)
+            db.session.add(question)
+            db.session.commit()
+
+            option_text = form.options[i].data
+            if option_text:  # Check if the option is not empty
+                option = Option(question_id=question.id, text=option_text.strip())
+                db.session.add(option)
+                db.session.commit()
+
+        flash('Quiz has been added', 'success')
+        return redirect(url_for('class_info', classid=form.class_id.data))
+
+    return render_template('addquiz.html', form=form, user_classes=user_classes)
 
 # Push the context onto the stack
 app_ctx.push()

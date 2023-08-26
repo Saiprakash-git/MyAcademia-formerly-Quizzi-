@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm  
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from wtforms import SubmitField, StringField, PasswordField, BooleanField, SelectField, FileField, DateField, TextAreaField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
+from wtforms import (SubmitField, StringField, PasswordField, BooleanField, 
+                     SelectField, FileField, DateField, TextAreaField, IntegerField, FieldList)
 from quiz.models import User, Class
 from flask_login import current_user
 
@@ -93,5 +94,14 @@ class UpdateAccount(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
-# class Account(FlaskForm): 
+
+class AddQuizForm(FlaskForm):
+    title = StringField('Quiz Title', validators=[DataRequired()])
+    class_id = SelectField('Class', validators=[DataRequired()], coerce=int)
+    timer = IntegerField('Question Timer (seconds)', validators=[DataRequired(), NumberRange(min=1)])
+    num_questions = IntegerField('Number of Questions', validators=[DataRequired(), NumberRange(min=1)])
+    questions = FieldList(StringField('Question'), min_entries=1)
+    options = FieldList(StringField('Option'), min_entries=1)
+    submit = SubmitField('Add Quiz')
+
     

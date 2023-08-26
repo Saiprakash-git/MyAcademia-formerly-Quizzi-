@@ -5,12 +5,17 @@
 {% if user.role == 'teacher' %}
 <form method="post" action="{{ url_for('add_class') }}">
     <button type="submit" class="btn btn-primary">Create Class</button>
+ 
 </form>
+<form method="post" action="{{ url_for('add_quiz') }}">
+    <button type="submit" class="btn btn-primary">Add Quiz</button>
+</form>   
 {% endif %}
 {% if user.role == 'student' %}
 <form method="POST" action="{{ url_for('join_class') }}">
     <button type="submit" class="btn btn-primary">Join Class</button>
 </form>
+
 {% endif %}
 
 
