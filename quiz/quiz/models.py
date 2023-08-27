@@ -28,7 +28,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     classses = db.relationship('Class', backref='user', lazy=True, cascade='all, delete-orphan', passive_deletes=True)
     assignments = db.relationship('Assignment',backref='assignment', lazy=True )
-    
+
     # completed_assignments = db.relationship('Assignment', secondary=submission_table, back_populates='completed_by')
     # # completed_quizzes = db.relationship('Quiz', secondary=submission_table, back_populates='completed_by')
 
@@ -49,7 +49,7 @@ class Class(db.Model):
     # students = db.relationship('User', secondary=enrollment_table, back_populates='classes')
     assignments = db.relationship('Assignment', backref='classs', lazy=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())  # Initialized
-
+    quizzes = db.relationship('Quiz',backref='class_',lazy=True)
     # quizzes = db.relationship('Quiz', backref='class', lazy=True)
     # assignments = db.relationship('Assignment', backref='class', lazy=True)
 
@@ -71,6 +71,7 @@ def __repr__(self):
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
+    quiz_code = db.Column(db.String(5), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     timer = db.Column(db.Integer)  # Default timer in seconds
     questions = db.relationship('Question', backref='quiz', lazy=True)
@@ -91,7 +92,12 @@ class Question(db.Model):
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
-    text = db.Column(db.String(200), nullable=False)
+    
+    option1 = db.Column(db.String(200), nullable=False)
+    option2 = db.Column(db.String(200), nullable=False)
+    option3 = db.Column(db.String(200), nullable=False)
+    option4 = db.Column(db.String(200), nullable=False)
+
     is_correct = db.Column(db.Boolean, default=False)
 
     def __repr__(self):

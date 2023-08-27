@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from quiz.models import User, Class , Assignment, Quiz, Question, Option
 import random, string 
 from werkzeug.utils import secure_filename
-from quiz.utils import assignment_added_email
+from quiz.utils import assignment_added_email, quizcode_generator, classcode_generator, get_users_with_assigned_quiz
 import os
 
 app_ctx = app.app_context()
@@ -74,7 +74,7 @@ def about():
     return render_template('about.html')
 
 
-def code_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
+def classcode_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 @app.route("/addclass", methods=['GET','POST'])
@@ -85,7 +85,7 @@ def add_class():
         if user.role == 'teacher' : 
             form = AddClass() 
             if form.validate_on_submit(): 
-                classcode = code_generator()
+                classcode = classcode_generator()
                 classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, user_id=current_user.id, nonuserid=current_user.id)
                 db.session.add(classs)
                 db.session.commit()
@@ -102,9 +102,10 @@ def class_info(classid):
     user = User.query.filter_by(username=classinfo.username).first()
     assignments = Assignment.query.filter_by(creator_id=current_user.id).all()
     userassigns = user.assignments
-    
+    quizzes = classinfo.quizzes
+    users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
-        return render_template('classinfo.html',classinfo=classinfo, current_user=current_user, assignments=assignments,userassigns=userassigns)
+        return render_template('classinfo.html',classinfo=classinfo, current_user=current_user, assignments=assignments,userassigns=userassigns,quizzes=quizzes)
 
 
 @app.route("/student/joinclass", methods=['GET','POST'])
@@ -157,7 +158,7 @@ def add_assignment():
                                 file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()
-        send_email(assignment)
+        #send_email(assignment)
         flash('Assignment created successfully!', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
@@ -217,7 +218,8 @@ def account():
     return render_template('account.html',current_user=current_user, image_file=image_file, form=form)
 
 
-    
+
+
 @app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
 @login_required
 def add_quiz():
@@ -225,12 +227,13 @@ def add_quiz():
 
     form = AddQuizForm()
     form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
-
+    quiz_code = quizcode_generator()
     if request.method == 'POST' and form.validate_on_submit():
         num_questions = form.num_questions.data  # Get the number of questions from the form
 
         quiz = Quiz(
             class_id=form.class_id.data,
+            quiz_code = quiz_code,
             title=form.title.data,
             timer=form.timer.data
         )
@@ -238,12 +241,12 @@ def add_quiz():
         db.session.commit()
 
         for i in range(num_questions):
-            question_text = form.questions[i].data
+            question_text = request.form.get(f'question_{i + 1}') 
             question = Question(quiz_id=quiz.id, text=question_text)
             db.session.add(question)
             db.session.commit()
 
-            option_text = form.options[i].data
+            option_text = request.form.get(f'question_{i + 1}_correct_option')  # Retrieve the correct option texts
             if option_text:  # Check if the option is not empty
                 option = Option(question_id=question.id, text=option_text.strip())
                 db.session.add(option)
