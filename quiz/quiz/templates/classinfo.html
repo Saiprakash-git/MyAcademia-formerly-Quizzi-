@@ -38,15 +38,15 @@
         {% endfor %}
         </div>
         <div class="col-md-6">
-            <h3>Quizzes</h3>
-            
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">quiz.title </h5>
-                    <p class="card-text">quiz.description </p>
-                    <p class="card-text">Due Date: quiz.due_date </p>
-                </div>
-            </div>
+            {% for quiz in quizzes %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{quiz.title}} </h5>
+                            <p class="card-text">code:{{quiz.quiz_code}}</p>
+                            <p class="card-text"> </p>
+                        </div>
+                    </div>
+                    {% endfor %}
            
         </div>
     </div>
@@ -74,18 +74,20 @@
                     </div>
                 {% endfor %}
                 </div>
+               
                 <div class="col-md-6">
                     <h3>Quizzes</h3>
-                    
+                    {% for quiz in quizzes %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title">quiz.title </h5>
-                            <p class="card-text">quiz.description </p>
-                            <p class="card-text">Due Date: quiz.due_date </p>
+                            <h5 class="card-title">{{quiz.title}} </h5>
+                            <p class="card-text">code:{{quiz.quiz_code}}</p>
+                            <p class="card-text"> </p>
                         </div>
                     </div>
-                   
+                    {% endfor %}
                 </div>
+              
             </div>
         </div>
         </form>
