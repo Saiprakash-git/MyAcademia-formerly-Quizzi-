@@ -219,6 +219,8 @@ def account():
 
 
 
+# Import necessary modules and classes
+# ...
 
 @app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
 @login_required
@@ -228,34 +230,54 @@ def add_quiz():
     form = AddQuizForm()
     form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
     quiz_code = quizcode_generator()
+
     if request.method == 'POST' and form.validate_on_submit():
         num_questions = form.num_questions.data  # Get the number of questions from the form
 
         quiz = Quiz(
             class_id=form.class_id.data,
-            quiz_code = quiz_code,
+            quiz_code=quiz_code,
             title=form.title.data,
             timer=form.timer.data
         )
         db.session.add(quiz)
         db.session.commit()
+        question , question_text= None
 
         for i in range(num_questions):
-            question_text = request.form.get(f'question_{i + 1}') 
+            question_text = request.form.get(f'question_{i + 1}')
+
+            # Create the Question instance
             question = Question(quiz_id=quiz.id, text=question_text)
             db.session.add(question)
             db.session.commit()
 
-            option_text = request.form.get(f'question_{i + 1}_correct_option')  # Retrieve the correct option texts
-            if option_text:  # Check if the option is not empty
-                option = Option(question_id=question.id, text=option_text.strip())
-                db.session.add(option)
-                db.session.commit()
+            correct_option_text = request.form.get(f'question_{i + 1}_correct_option_text')
+
+            
+            db.session.add(option)
+            db.session.commit()
+
+            for j in range(1, 5):
+                option_text = request.form.get(f'question_{i + 1}_option_{j}')
+                print('-------------------------------------------------------------------',option_text)
+                is_correct = (option_text == correct_option_text)
+
+                option_column = f'option{j}'
+                setattr(option, option_column, option_text)
+
+                if is_correct:
+                    option.is_correct = True
+            option = Option(question_id=question.id, is_correct=False)
+            db.session.add(option)
+            db.session.commit()
 
         flash('Quiz has been added', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
     return render_template('addquiz.html', form=form, user_classes=user_classes)
+
+
 
 # Push the context onto the stack
 app_ctx.push()

@@ -21,12 +21,13 @@
 
     {% for classs in classes %}
 
-        <div class="container mt-4">
+    <div class="col-md-9">
+        <div class="row class-cards">
+           
             <div class="col-md-4">
-                <div class="d-flex flex-row flex-nowrap">
+                <div class="class-card">
                     <div class="card">
                         <div class="card-body">
-
                             <tr>
                                 <td>
                                   <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>

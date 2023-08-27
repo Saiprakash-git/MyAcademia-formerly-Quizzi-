@@ -13,14 +13,24 @@
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Add
         </button>
-        <form action="#" method="post">
+        <form action="#" method="post" >
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="{{ url_for('add_assignment') }}">Assignment</a>
+            <button type="submit" class="btn btn-primary"  >Create Quiz</button>
     </div>
     </div>
     </div>
     </div>
-       
+    <div class="col-md-3">
+        <div class="quiz-frame">
+          
+            <form method="post" action="{{ url_for('add_quiz') }}">
+               
+            </form>
+            
+        
+        </div>
+    </div>
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-6">

@@ -12,26 +12,47 @@
 </form>
 {% endif %}
 
- 
-        <!-- Quiz Frame -->
-        <div class="col-md-3">
-            <div class="quiz-frame">
-                {% if user.role == 'teacher' %}
-                <div class="dropdown mt-3">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Add Quiz
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{{ url_for('add_quiz') }}">Quiz</a>
-                        <!-- Show additional options for teachers -->
-                        <a class="dropdown-item" href="#">Teacher Option 1</a>
-                        <a class="dropdown-item" href="#">Teacher Option 2</a>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Class Cards -->
+        <div class="col-md-9">
+            <div class="row class-cards">
+                {% for classs in classes %}
+                <div class="col-md-4">
+                    <div class="class-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <tr>
+                                    <td>
+                                      <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>
+                                    </td>
+                                    <td>
+                                      <div class="dropdown" style="display: inline-block;">
+                                        <button class="btn btn-secondary " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: black; background-color: white;" >
+                                            &vellip; <!-- Three dots entity -->
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                          <a class="dropdown-item" href="{{ url_for('class_info', classid=classs.id) }}">View Details</a>
+                                          <a class="dropdown-item delete-class" data-classid="{{ classs.id }}" href="#">Delete</a>
+                                          <!-- Add more options as needed -->
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                <p class="card-text">{{ classs.class_code }}</p>
+                                <a href="{{ url_for('class_info', classid=classs.id) }}" class="btn btn-primary">Go to Class</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                powered by MAF.co
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {% endif %}
-                <h2>Quiz Frame</h2>
+                {% endfor %}
             </div>
         </div>
+        <!-- Quiz Frame -->
+        
     </div>
 </div>
 
