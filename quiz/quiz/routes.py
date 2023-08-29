@@ -230,6 +230,7 @@ def account():
 # Import necessary modules and classes
 # ...
 
+
 @app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
 @login_required
 def add_quiz():
@@ -260,7 +261,7 @@ def add_quiz():
 
                 options = []
                 for j in range(1, 5):
-                    option_text = request.form.get(f'question_{i + 1}option{j}')
+                    option_text = request.form.get(f'question_{i + 1}_option_{j}')
                     if option_text:
                         options.append(option_text)
 
@@ -278,9 +279,7 @@ def add_quiz():
         flash('Quiz has been added', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
-    return render_template('addquiz.html', form=form, user_classes=user_classes)
-
-@app.route('/quiz/<int:quiz_id>')
+    return render_template('addquiz.html', form=form, user_classes=user_classes)@app.route('/quiz/<int:quiz_id>')
 def quiz_details(quiz_id):
     quiz =Quiz.query.get_or_404(quiz_id)
     return render_template('quizdetails.html',quiz=quiz, current_user=current_user)

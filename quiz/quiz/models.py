@@ -68,6 +68,33 @@ class Assignment(db.Model):
 def __repr__(self):
         return f"Assignment('{self.title}', '{self.class_id}')"
     
+
+class Class(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20),nullable=False)
+    class_name = db.Column(db.String(100), nullable=False)
+    class_code = db.Column(db.String(6),nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    nonuserid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    assignments = db.relationship('Assignment', backref='classs', lazy=True)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())  # Initialized
+    quizzes = db.relationship('Quiz',backref='class_',lazy=True)
+
+    def __repr__(self):
+        return f"Class('{self.class_name}')"
+
+
+class Assignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(500), nullable=True)
+    due_date = db.Column(db.DateTime, nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    file_attachment = db.Column(db.String(255), nullable=True)
+def __repr__(self):
+        return f"Assignment('{self.title}', '{self.class_id}')"
+    
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
@@ -76,7 +103,7 @@ class Quiz(db.Model):
     timer = db.Column(db.Integer)  # Default timer in seconds
     questions = db.relationship('Question', backref='quiz', lazy=True)
 
-    def _repr_(self):
+    def __repr__(self):
         return f"Quiz('{self.title}')"
 
 class Question(db.Model):
@@ -85,7 +112,7 @@ class Question(db.Model):
     text = db.Column(db.String(500), nullable=False)
     options = db.relationship('Option', backref='question', lazy=True)
 
-    def _repr_(self):
+    def __repr__(self):
         return f"Question('{self.text}')"
     
 
@@ -99,7 +126,7 @@ class Option(db.Model):
     option3 = db.Column(db.String(200), nullable=False)
     option4 = db.Column(db.String(200), nullable=False)
 
-    def _repr_(self):
+    def __repr__(self):
         return f"Option('Option 1: {self.option1}', 'Option 2: {self.option2}', 'Option 3: {self.option3}', 'Option 4: {self.option4}')"
         
         
