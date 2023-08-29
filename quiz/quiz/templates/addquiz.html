@@ -56,51 +56,24 @@
                 const optionInputContainer = document.createElement("div");
 
                 for (let j = 1; j <= 4; j++) {
-                    const optionInput = document.createElement("input");
-                    optionInput.type = "text";
-                    optionInput.name = "question_" + i + "_option_" + j;
-                    optionInput.placeholder = "Option " + j;
+    const optionInput = document.createElement("input");
+    optionInput.type = "text";
+    optionInput.name = "question_" + i + "option" + j;
 
-                    if (j === 4) {
-                        optionInput.placeholder += " (this is the correct option)";
-                        optionInput.name = "question_" + i + "_correct_option";
-                    }
+    if (j === 4) {
+        optionInput.name = "question_" + i + "_option_4"; // Keep the same naming convention
+    }
 
-                    optionInput.className = "form-control mb-2";
-                    optionInputContainer.appendChild(optionInput);
-                }
+    optionInput.placeholder = "Option " + j;
+    optionInput.className = "form-control mb-2";
+    optionInputContainer.appendChild(optionInput);
+}
 
                 questionDiv.appendChild(optionInputContainer);
                 questionsContainer.appendChild(questionDiv);
             }
         });
     });
-
-    // Inside the loop where you're creating option inputs
-for (let j = 1; j <= 4; j++) {
-    const optionInput = document.createElement("input");
-    optionInput.type = "text";
-    optionInput.name = "question_" + i + "_option_" + j;
-    optionInput.placeholder = "Option " + j;
-
-    if (j === 4) {
-        optionInput.placeholder += " (this is the correct option)";
-        optionInput.name = "question_" + i + "_correct_option_text"; // Use a different name for the text input
-    }
-
-    optionInput.className = "form-control mb-2";
-    optionInputContainer.appendChild(optionInput);
-    
-    // Add a hidden input for the correct option value
-    if (j === 4) {
-        const correctOptionValueInput = document.createElement("input");
-        correctOptionValueInput.type = "hidden";
-        correctOptionValueInput.name = "question_" + i + "_correct_option"; // Use the original name for the value
-        correctOptionValueInput.value = j; // Set the value of the correct option input
-        optionInputContainer.appendChild(correctOptionValueInput);
-    }
-}
-
 </script>
 
 

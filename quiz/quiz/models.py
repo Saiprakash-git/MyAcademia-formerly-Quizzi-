@@ -76,7 +76,7 @@ class Quiz(db.Model):
     timer = db.Column(db.Integer)  # Default timer in seconds
     questions = db.relationship('Question', backref='quiz', lazy=True)
 
-    def __repr__(self):
+    def _repr_(self):
         return f"Quiz('{self.title}')"
 
 class Question(db.Model):
@@ -85,9 +85,10 @@ class Question(db.Model):
     text = db.Column(db.String(500), nullable=False)
     options = db.relationship('Option', backref='question', lazy=True)
 
-    def __repr__(self):
+    def _repr_(self):
         return f"Question('{self.text}')"
     
+
 
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -98,10 +99,8 @@ class Option(db.Model):
     option3 = db.Column(db.String(200), nullable=False)
     option4 = db.Column(db.String(200), nullable=False)
 
-    is_correct = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return f"Option('{self.text}', Correct: {self.is_correct})"
+    def _repr_(self):
+        return f"Option('Option 1: {self.option1}', 'Option 2: {self.option2}', 'Option 3: {self.option3}', 'Option 4: {self.option4}')"
         
         
 

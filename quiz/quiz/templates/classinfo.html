@@ -13,19 +13,19 @@
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Add
         </button>
-        <form action="#" method="post" >
+        <form action="#" method="post">
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="{{ url_for('add_assignment') }}">Assignment</a>
-            <button type="submit" class="btn btn-primary"  >Create Quiz</button>
+           
     </div>
     </div>
     </div>
     </div>
     <div class="col-md-3">
         <div class="quiz-frame">
-          
+         </form>
             <form method="post" action="{{ url_for('add_quiz') }}">
-               
+                <button type="submit" class="btn btn-primary"  >Create Quiz</button>
             </form>
             
         
@@ -51,7 +51,8 @@
             {% for quiz in quizzes %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title">{{quiz.title}} </h5>
+                          
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
                             <p class="card-text">code:{{quiz.quiz_code}}</p>
                             <p class="card-text"> </p>
                         </div>

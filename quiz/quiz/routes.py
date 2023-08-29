@@ -69,6 +69,14 @@ def logout():
     flash('Log Out successfull', 'info')
     return render_template('frontpage.html')
 
+@app.route("/delete_account/<int:user_id>", methods=['GET','POST'])
+def delete_account(user_id): 
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit() 
+    return redirect(url_for('firstpage'))
+
+
 @app.route("/about")
 def about(): 
     return render_template('about.html')
@@ -100,7 +108,7 @@ def add_class():
 def class_info(classid):
     classinfo = Class.query.get_or_404(classid)
     user = User.query.filter_by(username=classinfo.username).first()
-    assignments = Assignment.query.filter_by(creator_id=current_user.id).all()
+    assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
     quizzes = classinfo.quizzes
     users_quizzes = get_users_with_assigned_quiz(classid)
@@ -242,42 +250,63 @@ def add_quiz():
         )
         db.session.add(quiz)
         db.session.commit()
-        question , question_text= None
 
         for i in range(num_questions):
-            question_text = request.form.get(f'question_{i + 1}')
+            question_text = request.form.get(f'question_{i + 1}')  # Retrieve question text from form
+            if question_text:
+                question = Question(quiz_id=quiz.id, text=question_text)
+                db.session.add(question)
+                db.session.commit()
 
-            # Create the Question instance
-            question = Question(quiz_id=quiz.id, text=question_text)
-            db.session.add(question)
-            db.session.commit()
+                options = []
+                for j in range(1, 5):
+                    option_text = request.form.get(f'question_{i + 1}option{j}')
+                    if option_text:
+                        options.append(option_text)
 
-            correct_option_text = request.form.get(f'question_{i + 1}_correct_option_text')
-
-            
-            db.session.add(option)
-            db.session.commit()
-
-            for j in range(1, 5):
-                option_text = request.form.get(f'question_{i + 1}_option_{j}')
-                print('-------------------------------------------------------------------',option_text)
-                is_correct = (option_text == correct_option_text)
-
-                option_column = f'option{j}'
-                setattr(option, option_column, option_text)
-
-                if is_correct:
-                    option.is_correct = True
-            option = Option(question_id=question.id, is_correct=False)
-            db.session.add(option)
-            db.session.commit()
+                if len(options) == 4:
+                    option = Option(
+                        question_id=question.id,
+                        option1=options[0],
+                        option2=options[1],
+                        option3=options[2],
+                        option4=options[3]
+                    )
+                    db.session.add(option)
+                    db.session.commit()
 
         flash('Quiz has been added', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
     return render_template('addquiz.html', form=form, user_classes=user_classes)
 
+@app.route('/quiz/<int:quiz_id>')
+def quiz_details(quiz_id):
+    quiz =Quiz.query.get_or_404(quiz_id)
+    return render_template('quizdetails.html',quiz=quiz, current_user=current_user)
 
+@app.route('/delete/<int:quiz_id>')
+def delete_quiz(quiz_id): 
+    quiz = Quiz.query.get_or_404(quiz_id)
+    classid = quiz.class_id 
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    
+    for question in questions:
+        options = Option.query.filter_by(question_id=question.id).all()
+        
+        # Delete options for the current question
+        for option in options:
+            db.session.delete(option)
+        
+        # Delete the current question
+        db.session.delete(question)
+    
+    # Delete the quiz
+    db.session.delete(quiz)
+    
+    db.session.commit()
+    flash('Quiz has been Deleted', 'success')
+    return redirect(url_for('class_info', classid=classid))
 
 # Push the context onto the stack
 app_ctx.push()

@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Quiz Details</h2>
+    <h3>{{ quiz.title }}</h3>
+    
+    <p>Due Date:</p>
+    <p>Class: {{ quiz.class_id }}</p>
+   
+      {% if current_user.role == 'teacher' %}
+      <a class="btn btn-primary"  href="{{ url_for('delete_quiz',quiz_id=quiz.id) }}"> Delete quiz</a>
+      {% endif %}
+  
+</div>
+{% endblock %}

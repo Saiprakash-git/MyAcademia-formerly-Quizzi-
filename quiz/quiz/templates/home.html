@@ -43,7 +43,7 @@
                                 <a href="{{ url_for('class_info', classid=classs.id) }}" class="btn btn-primary">Go to Class</a>
                             </div>
                             <div class="card-footer text-muted">
-                                powered by MAF.co
+                                powered by {{ classs.username }}
                             </div>
                         </div>
                     </div>
@@ -52,7 +52,16 @@
             </div>
         </div>
         <!-- Quiz Frame -->
-        
+        <div class="col-md-3">
+            <div class="quiz-frame">
+                {% if user.role == 'teacher' %}
+                <form method="post" action="{{ url_for('add_quiz') }}">
+                    <button type="submit" class="btn btn-primary">Create Quiz</button>
+                </form>
+                {% endif %}
+            
+            </div>
+        </div>
     </div>
 </div>
 

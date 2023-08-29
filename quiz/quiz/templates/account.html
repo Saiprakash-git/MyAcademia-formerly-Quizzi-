@@ -76,6 +76,12 @@
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
+          
+        </form>
+        <form method="POST" action="{{ url_for('delete_account', user_id=current_user.id) }}" enctype="multipart/form-data"> 
+            <div class="form-group">
+                <button class="btn btn-primary"> Delete account</button>
+            </div>
         </form>
     </div>
 {% endblock content %}
