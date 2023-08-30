@@ -70,7 +70,9 @@
     <h2><b>{{ classinfo.class_name }}</b></h2>
     <p> {{ classinfo.class_code }}</p>
     <div class="dropdown">
-       
+        <form action="{{url_for('exit_class',user_id=current_user.id, class_id=classinfo.id)}}">
+            <button class="btn btn-primary">Exit class</button>
+        </form>
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6">
@@ -91,8 +93,11 @@
                     {% for quiz in quizzes %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <h5 class="card-title">{{quiz.title}} </h5>
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
                             <p class="card-text">code:{{quiz.quiz_code}}</p>
+                            <form action="{{url_for('take_quiz',quiz_id=quiz.id)}}">
+                                <button class="btn btn-secondary">Attempt quiz</button>
+                            </form>
                             <p class="card-text"> </p>
                         </div>
                     </div>

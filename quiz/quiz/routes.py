@@ -142,6 +142,16 @@ def join_class():
             return redirect(url_for('home'))
         return render_template('joinclass.html',form=form)
 
+
+@app.route('/class<int:class_id>/remove<int:user_id>')
+def exit_class(user_id, class_id): 
+    user = User.query.get(user_id)
+    classs = Class.query.get(class_id)
+    user.classses.remove(classs)
+    return redirect(url_for('home'))
+    
+
+
 @app.route('/add_assignment', methods=['GET', 'POST'])
 @login_required
 def add_assignment():
@@ -268,6 +278,7 @@ def add_quiz():
                 if len(options) == 4:
                     option = Option(
                         question_id=question.id,
+                        quiz_id=quiz.id,
                         option1=options[0],
                         option2=options[1],
                         option3=options[2],
@@ -279,7 +290,9 @@ def add_quiz():
         flash('Quiz has been added', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
-    return render_template('addquiz.html', form=form, user_classes=user_classes)@app.route('/quiz/<int:quiz_id>')
+    return render_template('addquiz.html', form=form, user_classes=user_classes)
+
+@app.route('/quiz/<int:quiz_id>')
 def quiz_details(quiz_id):
     quiz =Quiz.query.get_or_404(quiz_id)
     return render_template('quizdetails.html',quiz=quiz, current_user=current_user)
@@ -307,9 +320,34 @@ def delete_quiz(quiz_id):
     flash('Quiz has been Deleted', 'success')
     return redirect(url_for('class_info', classid=classid))
 
+@app.route('/quiz/attempt<int:quiz_id>')
+def take_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = quiz.questions  # Retrieve quiz questions
+    return render_template('quiz.html', quiz=quiz, questions=questions)
+
+@app.route('/quiz/<int:quiz_id>/submit', methods=['POST'])
+def submit_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+  
+    questions = quiz.questions
+
+    total_score = 0
+
+    for question in questions:
+        user_answer = request.form.get(f'question_{question.id}')
+        # Compare user's answer with correct answer, update total_score
+
+    return render_template('quizresult.html', total_score=total_score)
+
+
+
+
+
+
+
 # Push the context onto the stack
 app_ctx.push()
-
 # Perform the database operation within the application context
 db.create_all()
 

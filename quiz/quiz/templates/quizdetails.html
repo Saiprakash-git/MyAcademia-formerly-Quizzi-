@@ -9,7 +9,11 @@
    
       {% if current_user.role == 'teacher' %}
       <a class="btn btn-primary"  href="{{ url_for('delete_quiz',quiz_id=quiz.id) }}"> Delete quiz</a>
+      {% else %}
+      <form action="{{url_for('take_quiz',quiz_id=quiz.id)}}">
+        <button class="btn btn-secondary">Attempt quiz</button>
+    </form>
       {% endif %}
-  
+      
 </div>
 {% endblock %}
