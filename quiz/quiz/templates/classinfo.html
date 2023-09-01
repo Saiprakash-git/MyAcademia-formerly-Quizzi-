@@ -95,7 +95,7 @@
                         <div class="card-body">
                             <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
                             <p class="card-text">code:{{quiz.quiz_code}}</p>
-                            <form action="{{url_for('take_quiz',quiz_id=quiz.id)}}">
+                            <form action="{{url_for('start_quiz',quiz_id=quiz.id)}}">
                                 <button class="btn btn-secondary">Attempt quiz</button>
                             </form>
                             <p class="card-text"> </p>

@@ -1,5 +1,5 @@
 from quiz import app, db , bcrypt,mail
-from flask import Flask , render_template, redirect, url_for, request, flash, current_app, request, send_from_directory, send_file
+from flask import Flask , render_template, redirect, url_for, request, flash, current_app, request, send_from_directory, send_file, session
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount, AddQuizForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
@@ -148,6 +148,7 @@ def exit_class(user_id, class_id):
     user = User.query.get(user_id)
     classs = Class.query.get(class_id)
     user.classses.remove(classs)
+    db.session.commit()
     return redirect(url_for('home'))
     
 
@@ -344,6 +345,56 @@ def submit_quiz(quiz_id):
 
 
 
+
+
+# Your existing models and database setup code
+
+@app.route('/quiz/start_quiz/<int:quiz_id>')
+def start_quiz(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    # Check if the quiz exists
+    if quiz is None:
+        return "Invalid quiz code"
+    
+    # Get the list of questions for the quiz
+    questions = quiz.questions
+    # Shuffle the questions randomly
+    random.shuffle(questions)
+
+    # Initialize the session variables for storing the current question index and the score
+    if 'current_question' not in session:
+        session['current_question'] = 0
+    if 'score' not in session:
+        session['score'] = 0
+    
+    # Check if the user has submitted an answer
+    if request.method == 'POST':
+        # Get the user's answer from the form
+        answer = request.form.get('answer')
+        # Get the correct answer from the database
+        correct_answer = questions[session['current_question']].options[0].option1 # Assuming option1 is always correct
+        # Compare the user's answer with the correct answer and update the score accordingly
+        if answer == correct_answer:
+            session['score'] += 1
+        
+        # Increment the current question index by 1
+        session['current_question'] += 1
+    
+    # Check if there are more questions left
+    if session['current_question'] < len(questions):
+        # Get the current question object
+        question = questions[session['current_question']]
+        # Get the options for the current question
+        options = question.options[0]
+        # Render the quiz template with the quiz, question, and options data
+        return render_template('question_template.html', quiz=quiz, question=question, options=options)
+    
+    else:
+        # Reset the session variables
+        session.pop('current_question')
+        session.pop('score')
+        # Render a message to indicate that the quiz is over
+        return "Quiz is over. Thank you for participating."
 
 
 # Push the context onto the stack

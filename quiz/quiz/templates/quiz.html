@@ -2,9 +2,12 @@
 {% block content %}
 <div class="container mt-4">
     <h2>{{ quiz.title }}</h2>
-    <form method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}">
-        {% for question in questions %}
-        <div class="question">
+    <div id="quiz-container">
+        <!-- The current question will be displayed here -->
+   
+    <form id="quiz-form" method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}" >
+        <div class="question" id="question-{{ questions[0].id }}">
+            {% for question in questions %}
             <p>Q..{{ question.text }}</p>
             {% for option in question.options %}
             <label>
@@ -17,123 +20,43 @@
                 <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
                 {{ option.option3 }}
                 <br>
-                <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
-                {{ option.option4 }} <!-- Display options accordingly -->
+                <input type="radio" name="question_{{ questions.id }}" value="{{ option.id }}">
+                {{ option.option4 }}
+                <br>
             </label><br>
             {% endfor %}
-        </div>
-        {% endfor %}
-        <button type="submit">Submit</button>
-    </form>
-</div>
-{% endblock %}
-    
-<!-- {% extends "layout.html" %}
-{% block content %}
-    <div class="container mt-4">
-        <h2>{{ quiz.title }}</h2>
-        <div id="questionContainer">
-            <div id="question"></div>
-            <div>Time left: <span id="timer"></span> seconds</div>
-            <button onclick="submitAnswer(0)">Option 1</button>
-            <button onclick="submitAnswer(1)">Option 2</button>
-            <button onclick="submitAnswer(2)">Option 3</button>
-        </div>
-        <div id="quizCompleted">Quiz Completed!</div>
-        <form method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}">
-            {% for question in questions %}
-            <div class="question">
-                <p>Q..{{ question.text }}</p>
-                {% for option in question.options %}
-                <label>
-                    <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
-                    {{ option.option1 }}
-                    <br>
-                    <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
-                    {{ option.option2 }}
-                    <br>
-                    <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
-                    {{ option.option3 }}
-                    <br>
-                    <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
-                    {{ option.option4 }} <!-- Display options accordingly -->
-                </label><br>
-                {% endfor %}
-            </div>
             {% endfor %}
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-    
-   
-       <script>
-        let countdown; // Global variable to store the countdown interval
-        let currentQuestionIndex = 0;
-        const questions = [
-            // Array of question objects from the database
-            {
-                text: "Question 1",
-                options: ["Option 1", "Option 2", "Option 3"],
-                correctOption: 0,
-                timeLimit: 10 // seconds
-            },
-            {
-                text: "Question 2",
-                options: ["Option 1", "Option 2", "Option 3"],
-                correctOption: 1,
-                timeLimit: 10 // seconds
-            },
-            // Add more questions here
-        ];
-        
-        function startTimer(duration, display, callback) {
-            let timer = duration;
-            countdown = setInterval(function () {
-                display.textContent = timer;
-                if (--timer < 0) {
-                    clearInterval(countdown);
-                    callback();
-                }
-            }, 1000);
-        }
-        
-        function displayQuestion(index) {
-            if (index >= questions.length) {
-                document.getElementById("quizCompleted").style.display = "block";
-                return;
-            }
-            
-            const questionContainer = document.getElementById("questionContainer");
-            questionContainer.style.opacity = 0; // Fade out
-            setTimeout(function () {
-                document.getElementById("question").textContent = questions[index].text;
-                startTimer(questions[index].timeLimit, document.getElementById("timer"), function() {
-                    if (!questions[index].answered) {
-                        submitAnswer(null); // Automatically move to the next question
-                    }
-                });
-                questionContainer.style.opacity = 1; // Fade in
-            }, 500); // Wait for fade-out transition
-            
-        }
-        
-        function startQuiz() {
-            displayQuestion(currentQuestionIndex);
-        }
-        
-        function submitAnswer(selectedOption) {
-            clearInterval(countdown); // Stop the timer
-            const correctOption = questions[currentQuestionIndex].correctOption;
-            questions[currentQuestionIndex].answered = true; // Mark question as answered
-            
-            if (selectedOption === correctOption) {
-                // Display correct answer message
-            } else {
-                // Display incorrect answer message
-            }
-            
-            // Move to the next question
+        </div>
+        <button type="button" id="next-button">Next</button>
+        <button type="submit" id="submit-button" style="display: none;">Submit</button>
+    </form>
+</div> 
+
+<script>
+    const quizContainer = document.getElementById('quiz-container');
+    const quizForm = document.getElementById('quiz-form');
+    const questions = document.querySelectorAll('.question');
+    const nextButton = document.getElementById('next-button');
+    const submitButton = document.getElementById('submit-button');
+    let currentQuestionIndex = 0;
+
+    function showNextQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            questions[currentQuestionIndex].style.display = 'none';
             currentQuestionIndex++;
-            displayQuestion(currentQuestionIndex);
+            if (currentQuestionIndex < questions.length) {
+                questions[currentQuestionIndex].style.display = 'block';
+            } else {
+                submitButton.style.display = 'block';
+                nextButton.style.display = 'none';
+            }
         }
-    </script> -->
+    }
+
+    nextButton.addEventListener('click', showNextQuestion);
+
+    // Start the quiz by showing the first question
+    questions[0].style.display = 'block';
+    nextButton.style.display = 'block';
+</script>
+{% endblock %}
