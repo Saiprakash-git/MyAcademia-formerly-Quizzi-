@@ -60,6 +60,7 @@ class Quiz(db.Model):
     timer = db.Column(db.Integer)  # Default timer in seconds
     questions = db.relationship('Question', backref='quiz', lazy=True)
     options = db.relationship('Option',backref='quiz', lazy=True)
+    quizlog  = db.relationship('QuizLog',backref='quizlog', lazy=True)
     def _repr_(self):
         return f"Quiz('{self.title}')"
 
@@ -73,7 +74,6 @@ class Question(db.Model):
         return f"Question('{self.text}')"
     
 
-
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
@@ -82,58 +82,20 @@ class Option(db.Model):
     option2 = db.Column(db.String(200), nullable=False)
     option3 = db.Column(db.String(200), nullable=False)
     option4 = db.Column(db.String(200), nullable=False)
-
+    is_correct = db.Column(db.Boolean, default=False) 
     def _repr_(self):
-        return f"Option('Option 1: {self.option1}', 'Option 2: {self.option2}', 'Option 3: {self.option3}', 'Option 4: {self.option4}')"
+        return f"Option('Option 1: {self.option1}', 'Option 2: {self.option2}', 'Option 3: {self.option3}', 'Option 4: {self.option4}','Is Correct: {self.is_correct}')"
         
-        
 
-# class Quiz(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
-#     title = db.Column(db.String(100), nullable=False)
-#     timer = db.Column(db.Integer, default=15)  # Default timer in seconds
-#     questions = db.relationship('Question', backref='quiz', lazy=True)
-#     attempts = db.relationship('StudentAttempt', backref='quiz', lazy=True)
+class QuizLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entered_answer = db.Column(db.String(200), nullable=False)
+    correct_answer = db.Column(db.String(200), nullable=False)
+    total_marks = db.Column(db.Integer, nullable=False)
+    
+    def __repr__(self):
+        return f"QuizLog('Quiz ID: {self.quiz_id}', 'Student ID: {self.student_id}', 'Entered Answer: {self.entered_answer}', 'Correct Answer: {self.correct_answer}', 'Total Marks: {self.total_marks}')"
 
-#     def __repr__(self):
-#         return f"Quiz('{self.title}')"
 
-# class Question(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-#     text = db.Column(db.String(500), nullable=False)
-#     options = db.relationship('Option', backref='question', lazy=True)
-
-#     def __repr__(self):
-#         return f"Question('{self.text}')"
-
-# class Option(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
-#     text = db.Column(db.String(200), nullable=False)
-#     is_correct = db.Column(db.Boolean, default=False)
-
-#     def __repr__(self):
-#         return f"Option('{self.text}', Correct: {self.is_correct})"
-# class Quiz(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
-#     username = db.relationship('User', backref='username',lazy=True)
-#     question = db.Column(db.String(200), nullable=False)
-#     options = db.Column(db.String(500), nullable=False)
-#     correct_option = db.Column(db.Integer, nullable=False)
-
-#     def __repr__(self):
-#         return f"Quiz('{self.question}', '{self.options}', '{self.correct_option}')"
-
-# class Assignment(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     class_code = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
-#     username =  db.relationship('User', backref='username',lazy=True)
-#     assignment_title = db.Column(db.String(200), nullable=False)
-#     assignment_description = db.Column(db.String(500), nullable=False)
-
-#     def __repr__(self):
-#         return f"Assignment('{self.title}', '{self.description}')"

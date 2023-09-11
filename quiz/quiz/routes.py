@@ -3,10 +3,11 @@ from flask import Flask , render_template, redirect, url_for, request, flash, cu
 from quiz.forms import RegistrationForm, LoginForm, AddClass , JoinClass, AddAssignment, UpdateAccount, AddQuizForm
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_sqlalchemy import SQLAlchemy 
-from quiz.models import User, Class , Assignment, Quiz, Question, Option
+from quiz.models import User, Class , Assignment, Quiz, Question, Option, QuizLog
 import random, string 
+from random import shuffle
 from werkzeug.utils import secure_filename
-from quiz.utils import assignment_added_email, quizcode_generator, classcode_generator, get_users_with_assigned_quiz
+from quiz.utils import assignment_added_email, quizcode_generator, classcode_generator, get_users_with_assigned_quiz, get_user_attempted_quizzes
 import os
 
 app_ctx = app.app_context()
@@ -14,7 +15,7 @@ app_ctx = app.app_context()
 @app.route("/")
 def firstpage():
    
-     return render_template('frontpage.html')
+     return render_template('firstpage.html')
 
 
 @app.route("/home", methods=['GET'])
@@ -67,7 +68,28 @@ def login():
 def logout(): 
     logout_user()
     flash('Log Out successfull', 'info')
-    return render_template('frontpage.html')
+    return redirect(url_for('login'))
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account(): 
+    if current_user.role == 'teacher':
+        image_file = url_for('static', filename='profiles/' + 'teacher_logo.jpg')
+    if current_user.role == 'student':
+        image_file = url_for('static', filename='profiles/' + 'student_b.jpg')
+    form = UpdateAccount() 
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.pin = form.pin.data
+        current_user.role = form.role.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    return render_template('account.html',current_user=current_user, image_file=image_file, form=form)
 
 @app.route("/delete_account/<int:user_id>", methods=['GET','POST'])
 def delete_account(user_id): 
@@ -111,9 +133,18 @@ def class_info(classid):
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
     quizzes = classinfo.quizzes
+    quizlog = {}  # Create an empty dictionary to store quiz log entries
+    
+    # Iterate through the quizzes and retrieve the last attempt for each
+    for quiz in quizzes:
+        last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
+        if last_attempt:
+            quizlog[quiz.id] = last_attempt
+    
     users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
-        return render_template('classinfo.html',classinfo=classinfo, current_user=current_user, assignments=assignments,userassigns=userassigns,quizzes=quizzes)
+        return render_template('classinfo.html',classinfo=classinfo, current_user=current_user,
+                                assignments=assignments,userassigns=userassigns,quizzes=quizzes,quizlog=quizlog)
 
 
 @app.route("/student/joinclass", methods=['GET','POST'])
@@ -177,7 +208,7 @@ def add_assignment():
                                 file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()
-        #send_email(assignment)
+        send_email(assignment)
         flash('Assignment created successfully!', 'success')
         return redirect(url_for('class_info', classid=form.class_id.data))
 
@@ -215,26 +246,6 @@ def delete_assignment(assignment_id):
     db.session.commit()
     return redirect(url_for('class_info',classid=classid))
 
-@app.route('/account', methods=['GET', 'POST'])
-@login_required
-def account(): 
-    if current_user.role == 'teacher':
-        image_file = url_for('static', filename='profiles/' + 'teacher_logo.jpg')
-    if current_user.role == 'student':
-        image_file = url_for('static', filename='profiles/' + 'student_logo.jpeg')
-    form = UpdateAccount() 
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        current_user.pin = form.pin.data
-        current_user.role = form.role.data
-        db.session.commit()
-        flash('Your account has been updated!', 'success')
-        return redirect(url_for('account'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-    return render_template('account.html',current_user=current_user, image_file=image_file, form=form)
 
 
 
@@ -296,7 +307,8 @@ def add_quiz():
 @app.route('/quiz/<int:quiz_id>')
 def quiz_details(quiz_id):
     quiz =Quiz.query.get_or_404(quiz_id)
-    return render_template('quizdetails.html',quiz=quiz, current_user=current_user)
+    total_questions = len(quiz.questions)
+    return render_template('quizdetails.html',quiz=quiz, current_user=current_user, total_questions=total_questions)
 
 @app.route('/delete/<int:quiz_id>')
 def delete_quiz(quiz_id): 
@@ -327,18 +339,19 @@ def take_quiz(quiz_id):
     questions = quiz.questions  # Retrieve quiz questions
     return render_template('quiz.html', quiz=quiz, questions=questions)
 
-@app.route('/quiz/<int:quiz_id>/submit', methods=['POST'])
+@app.route('/quiz/<int:quiz_id>/submit', methods=['GET','POST'])
 def submit_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
   
     questions = quiz.questions
 
     total_score = 0
-
+    user_answer = []
     for question in questions:
         user_answer = request.form.get(f'question_{question.id}')
         # Compare user's answer with correct answer, update total_score
-
+        if user_answer == 4:
+            total_score+=1
     return render_template('quizresult.html', total_score=total_score)
 
 
@@ -349,9 +362,10 @@ def submit_quiz(quiz_id):
 
 # Your existing models and database setup code
 
-@app.route('/quiz/start_quiz/<int:quiz_id>')
+@app.route('/quiz/start_quiz/<int:quiz_id>', methods=['GET','POST'])
 def start_quiz(quiz_id):
     quiz = Quiz.query.get(quiz_id)
+
     # Check if the quiz exists
     if quiz is None:
         return "Invalid quiz code"
@@ -359,7 +373,7 @@ def start_quiz(quiz_id):
     # Get the list of questions for the quiz
     questions = quiz.questions
     # Shuffle the questions randomly
-    random.shuffle(questions)
+    shuffle(questions)
 
     # Initialize the session variables for storing the current question index and the score
     if 'current_question' not in session:
@@ -372,12 +386,12 @@ def start_quiz(quiz_id):
         # Get the user's answer from the form
         answer = request.form.get('answer')
         # Get the correct answer from the database
-        correct_answer = questions[session['current_question']].options[0].option1 # Assuming option1 is always correct
+        correct_answer = questions[session['current_question']].options[0].option4 # Assuming option1 is always correct
         # Compare the user's answer with the correct answer and update the score accordingly
         if answer == correct_answer:
             session['score'] += 1
         
-        # Increment the current question index by 1
+        # Increment the current question index by 1	
         session['current_question'] += 1
     
     # Check if there are more questions left
@@ -386,15 +400,21 @@ def start_quiz(quiz_id):
         question = questions[session['current_question']]
         # Get the options for the current question
         options = question.options[0]
+        
         # Render the quiz template with the quiz, question, and options data
-        return render_template('question_template.html', quiz=quiz, question=question, options=options)
+        return render_template('question_template.html', quiz=quiz, question=question, options=options, timer=quiz.timer)
     
     else:
+        result = session['score']
         # Reset the session variables
         session.pop('current_question')
         session.pop('score')
         # Render a message to indicate that the quiz is over
-        return "Quiz is over. Thank you for participating."
+        quizlog = QuizLog(quiz_id=quiz.id,student_id=current_user.id,entered_answer=answer, correct_answer=correct_answer, total_marks=result)
+        db.session.add(quizlog)
+        db.session.commit()
+        return render_template("quizresult.html",result=result)
+
 
 
 # Push the context onto the stack

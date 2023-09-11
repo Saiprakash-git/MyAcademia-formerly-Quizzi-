@@ -14,7 +14,7 @@
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Class Cards -->
+        
         <div class="col-md-9">
             <div class="row class-cards">
                 {% for classs in classes %}
@@ -27,16 +27,20 @@
                                       <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>
                                     </td>
                                     <td>
+                                        <div class="threedot">
                                       <div class="dropdown" style="display: inline-block;">
-                                        <button class="btn btn-secondary " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: black; background-color: white;" >
+                                        
+                                        <button  id="dropdownMenuButton" data-toggle="dropdown"   >
                                             &vellip; <!-- Three dots entity -->
                                         </button>
+                                    
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                           <a class="dropdown-item" href="{{ url_for('class_info', classid=classs.id) }}">View Details</a>
                                           <a class="dropdown-item delete-class" data-classid="{{ classs.id }}" href="#">Delete</a>
                                           <!-- Add more options as needed -->
                                         </div>
                                       </div>
+                                    </div>
                                     </td>
                                   </tr>
                                 <p class="card-text">{{ classs.class_code }}</p>

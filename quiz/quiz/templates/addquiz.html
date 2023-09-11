@@ -61,10 +61,11 @@
     optionInput.name = "question_" + i + "_option_" + j;
 
     if (j === 4) {
-        optionInput.name = "question_" + i + "_option_4"; // Keep the same naming convention
-    }
-
+    optionInput.name = "question_" + i + "_option_4"; // Keep the same naming convention
+    optionInput.placeholder = "Option " + j + " (Enter the correct option)"; // Add "(Enter the correct option)" to the placeholder
+} else {
     optionInput.placeholder = "Option " + j;
+}
     optionInput.className = "form-control mb-2";
     optionInputContainer.appendChild(optionInput);
 }

@@ -1,12 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
-
+<div class="classinfoo">
+<div class="content-section" id="classinfo">
 {% if current_user.role == 'teacher' %}
 <form method="POST" enctype="multipart/form-data">
 <div class="bg">
     <div class="container">
     <h2><b>{{ classinfo.class_name }}</b></h2>
-    <p> {{ classinfo.class_code }}</p>
+    <p> code: {{ classinfo.class_code }}</p>
+   
     <div class="dropdown">
        
         
@@ -93,19 +95,31 @@
                     {% for quiz in quizzes %}
                     <div class="card mb-3">
                         <div class="card-body">
-                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
-                            <p class="card-text">code:{{quiz.quiz_code}}</p>
-                            <form action="{{url_for('start_quiz',quiz_id=quiz.id)}}">
-                                <button class="btn btn-secondary">Attempt quiz</button>
-                            </form>
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{ quiz.title }}</a>
+                            <p class="card-text">code: {{ quiz.quiz_code }}</p>
+                            
+                            {% if quiz.id in quizlog %}
+                                <p class="card-text">Previous Result: {{ quizlog[quiz.id].total_marks }}</p>
+                                <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                    <button class="btn btn-secondary">Re-attempt</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                    <button class="btn btn-secondary">Attempt quiz</button>
+                                </form>
+                            {% endif %}
+                            
                             <p class="card-text"> </p>
                         </div>
                     </div>
                     {% endfor %}
                 </div>
+                
               
             </div>
         </div>
         </form>
         {% endif %}
+</div>
+</div>
 {% endblock %}
