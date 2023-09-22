@@ -1,6 +1,6 @@
 import random
 import string
-from quiz.models import Class, Quiz, QuizLog
+from quiz.models import Class, Quiz
 from flask_mail import Message
 from flask import url_for
 from quiz import  mail
@@ -19,6 +19,10 @@ def classcode_generator(size=6, chars=string.ascii_uppercase + string.ascii_lowe
 def quizcode_generator(size=5, chars=string.ascii_uppercase + string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+def live_quizcode_generator(size=5, chars=string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
 def get_users_with_assigned_quiz(class_id):
     class_ = Class.query.get(class_id)
 
@@ -26,7 +30,7 @@ def get_users_with_assigned_quiz(class_id):
         return []
 
     # Get the users who have joined the class
-    joined_users = class_.user.query.all()
+    joined_users = class_.students
     users_with_assigned_quiz = []
 
     # Iterate through each user and check if they have been assigned any quiz in the class
@@ -38,8 +42,10 @@ def get_users_with_assigned_quiz(class_id):
     return users_with_assigned_quiz
 
 def get_user_attempted_quizzes(user,quiz): 
-    last_attempt = QuizLog.query.filter_by(student_id=user, quiz_id=quiz).order_by(QuizLog.id.desc()).first()
-    print("------------------------------------------------",last_attempt)
+    
     # If a record exists, return the timestamp of the last attempt, otherwise return None
-    return last_attempt 
-        
+    return 0
+
+def check_class_code(classcode): 
+    classs = Class.query.filter_by(class_code=classcode).first()
+    return classs

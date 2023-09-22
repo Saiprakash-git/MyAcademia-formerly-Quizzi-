@@ -27,4 +27,14 @@ app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
 
 mail = Mail(app)
 
-from quiz import routes
+from quiz.users import routes
+from quiz.main import routes
+from quiz.Class import routes 
+from quiz.quiz import routes 
+from quiz.assignment import routes
+
+app_ctx = app.app_context()
+
+app_ctx.push()
+db.create_all()
+

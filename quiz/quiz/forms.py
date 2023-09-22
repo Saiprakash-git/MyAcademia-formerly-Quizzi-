@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm  
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange,Optional
 from wtforms import (SubmitField, StringField, PasswordField, BooleanField, 
                      SelectField, FileField, DateField, TextAreaField, IntegerField, FieldList)
 from quiz.models import User, Class
@@ -10,11 +10,11 @@ from flask_login import current_user
 class RegistrationForm(FlaskForm): 
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
-    pin = StringField('Pin',validators=[DataRequired(), Length(min=10,max=12)])
+    role = SelectField('Role', choices=[('choose', 'Choose...'),('teacher', 'Teacher'), ('student', 'Student')])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    role = SelectField('Role', choices=[('choose', 'Choose...'),('teacher', 'Teacher'), ('student', 'Student')])
+    pin = StringField('Pin',validators=[ Length(min=10,max=12)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
@@ -39,8 +39,8 @@ class RegistrationForm(FlaskForm):
         
         
 class LoginForm(FlaskForm): 
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+    username = StringField('pin/username',
+                        validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
@@ -105,3 +105,11 @@ class AddQuizForm(FlaskForm):
     submit = SubmitField('Add Quiz')
 
     
+class AddLiveQuizForm(FlaskForm):
+    title = StringField('Quiz Title', validators=[DataRequired()])
+
+    timer = IntegerField('Question Timer (seconds)', validators=[DataRequired(), NumberRange(min=1)])
+    num_questions = IntegerField('Number of Questions', validators=[DataRequired(), NumberRange(min=1)])
+    questions = FieldList(StringField('Question'), min_entries=1)
+    options = FieldList(StringField('Option'), min_entries=1)
+    submit = SubmitField('Add Quiz')

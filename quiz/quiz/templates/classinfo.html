@@ -8,7 +8,8 @@
     <div class="container">
     <h2><b>{{ classinfo.class_name }}</b></h2>
     <p> code: {{ classinfo.class_code }}</p>
-   
+    
+    <p>Total Number of Participants: {{ participants}}</p>
     <div class="dropdown">
        
         
@@ -55,7 +56,8 @@
                         <div class="card-body">
                           
                             <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
-                            <p class="card-text">code:{{quiz.quiz_code}}</p>
+                            <p class="card-text">code: {{quiz.quiz_code}}</p>
+                            <a href="{{url_for('quiz_result',quiz_id=quiz.id)}}" class="btn btn-primary">Get results</a>
                             <p class="card-text"> </p>
                         </div>
                     </div>

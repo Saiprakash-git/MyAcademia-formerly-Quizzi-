@@ -47,7 +47,7 @@
                                 <a href="{{ url_for('class_info', classid=classs.id) }}" class="btn btn-primary">Go to Class</a>
                             </div>
                             <div class="card-footer text-muted">
-                                powered by {{ classs.username }}
+                                Teacher: {{ classs.username }}
                             </div>
                         </div>
                     </div>
@@ -59,9 +59,16 @@
         <div class="col-md-3">
             <div class="quiz-frame">
                 {% if user.role == 'teacher' %}
-                <form method="post" action="{{ url_for('add_quiz') }}">
-                    <button type="submit" class="btn btn-primary">Create Quiz</button>
+                <form method="post" action="{{ url_for('add_livequiz') }}">
+                    <button type="submit" class="btn btn-primary">Live Quiz</button>
                 </form>
+                <div class="quiz-container">
+                    <div class="quizzescard">
+                        <div class="card-content">
+                           
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
             
             </div>
@@ -73,7 +80,9 @@
     <div class="row">
         <div class="col-md-6">
             <h3>Quizzes</h3>
-            {% for quiz in quizzes %}
+            {% if quizzes %}
+            {% for quiz in quizzes %} 
+            
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ quiz.title }}</h5>
@@ -83,6 +92,7 @@
                 </div>
             </div>
             {% endfor %}
+            {% endif%}
         </div>
     </div>
 </div>
