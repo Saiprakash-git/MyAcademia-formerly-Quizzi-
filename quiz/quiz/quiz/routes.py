@@ -94,7 +94,10 @@ def submit_quiz(quiz_id):
 def start_live_quiz(quiz_id):
     livequiz = LiveQuiz.query.get_or_404(quiz_id)
     quiztitle = session.get('livequiztitle')
-    return render_template('startlivequiz.html',quiz_code=livequiz.quiz_code,quiztitle=quiztitle)
+    joined = []
+    def students_joined(username):
+        joined.append(username)
+    return render_template('startlivequiz.html',quiz_code=livequiz.quiz_code,quiztitle=quiztitle,joined=joined)
 
 @app.route('/livequiz', methods=['POST','GET'])
 def add_livequiz(): 
@@ -152,11 +155,19 @@ def start_quiz(quiz_id):
     print(questions)
 
 
-@app.route('/JoinQuiz/<int:quiz_code>')
-def join_quiz(quiz_code):
+@app.route('/JoinQuiz', methods=['POST'])
+def join_quiz():
+    quiz_code = request.args.get('quiz_code') 
+    username = session.get('current_user.username')
+    print(username)
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
-    user = User.query.filter_by(username=current_user.username).first()
-    
+    session['current_quiz'] = {
+        'quiz_id':quiz.id,
+        'quiz_code':quiz.quiz_code, 
+        'title':quiz.title,
+        'timer':quiz.timer
+    } 
+    return redirect(url_for('students_joined',username=username))
 
     
 

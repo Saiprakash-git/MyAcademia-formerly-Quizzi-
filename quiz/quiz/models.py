@@ -85,3 +85,10 @@ class LiveQuiz(db.Model):
     def __repr__(self):
             return f"LiveQuiz('quiz_id:{self.quiz_id}','quiz_code:{self.quiz_code}')"
     
+class QuizAttempts(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    quiz_id = db.Column(db.Integer,db.ForeignKey('quiz.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    quiz_code = db.Column(db.Integer, nullable=False, unique=True)
+    time = db.Column(db.DateTime, default=datetime.utcnow)
+    score = db.Column(db.Integer, nullable=False)

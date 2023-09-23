@@ -1,7 +1,7 @@
 from quiz import app,db, bcrypt
 from quiz.models import User
 from quiz.forms import RegistrationForm,LoginForm , UpdateAccount
-from flask import  render_template, redirect, url_for, request, flash, request
+from flask import  render_template, redirect, session, url_for, request, flash, request
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import or_
 
@@ -33,7 +33,13 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-           
+            session['current_user'] = { 
+                'id':user.id,
+                'username':user.username, 
+                'pin':user.pin,
+                'email':user.email,
+                'role':user.role
+            }
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
