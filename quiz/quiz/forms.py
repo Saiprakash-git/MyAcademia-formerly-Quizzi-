@@ -113,3 +113,7 @@ class AddLiveQuizForm(FlaskForm):
     questions = FieldList(StringField('Question'), min_entries=1)
     options = FieldList(StringField('Option'), min_entries=1)
     submit = SubmitField('Add Quiz')
+
+class JoinQuiz(FlaskForm):
+    quiz_code = StringField('Quiz Code',validators=[DataRequired()])
+    submit = SubmitField('Submit')

@@ -1,11 +1,13 @@
 from quiz import app,db 
-from quiz.models import Class,Quiz,Option, Question, LiveQuiz, User
+from quiz.models import Class,Quiz,Option, Question, LiveQuiz, User, QuizAttempts
 from quiz.forms import AddQuizForm, AddLiveQuizForm
 from flask_login import  current_user, login_required
 from quiz.utils import quizcode_generator , live_quizcode_generator
 from flask import render_template, redirect, url_for, request, flash, session
 from random import shuffle
 from datetime import datetime
+
+student_details = []
 
 @app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
 @login_required
@@ -95,9 +97,10 @@ def start_live_quiz(quiz_id):
     livequiz = LiveQuiz.query.get_or_404(quiz_id)
     quiztitle = session.get('livequiztitle')
     joined = []
+    students_in_quiz = [student for student in student_details if student['quiz_id'] == quiz_id]
     def students_joined(username):
         joined.append(username)
-    return render_template('startlivequiz.html',quiz_code=livequiz.quiz_code,quiztitle=quiztitle,joined=joined)
+    return render_template('startlivequiz.html',quiz_code=livequiz.quiz_code,quiztitle=quiztitle,joined=joined,students_in_quiz=students_in_quiz)
 
 @app.route('/livequiz', methods=['POST','GET'])
 def add_livequiz(): 
@@ -155,20 +158,22 @@ def start_quiz(quiz_id):
     print(questions)
 
 
-@app.route('/JoinQuiz', methods=['POST'])
-def join_quiz():
-    quiz_code = request.args.get('quiz_code') 
-    username = session.get('current_user.username')
-    print(username)
+@app.route('/JoinQuiz/<int:quiz_code>', methods=['POST','GET'])
+def join_quiz(quiz_code):
+    print("==============",quiz_code)
+    username = session['current_user']['username']
+    print("================vwsdwsin",username)
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
-    session['current_quiz'] = {
-        'quiz_id':quiz.id,
-        'quiz_code':quiz.quiz_code, 
-        'title':quiz.title,
-        'timer':quiz.timer
-    } 
-    return redirect(url_for('students_joined',username=username))
-
+    print(quiz)
+    if quiz:
+        session['current_quiz'] = {
+            'quiz_id':quiz.id,
+            'quiz_code':quiz.quiz_code, 
+            'title':quiz.title,
+            'timer':quiz.timer
+        } 
+    student_details.append({'quiz_id': quiz.id, 'username':username})
+    return redirect(url_for('start_live_quiz',quiz_id=quiz.id))
     
 
 @app.route('/quiz/<int:quiz_id>/results')

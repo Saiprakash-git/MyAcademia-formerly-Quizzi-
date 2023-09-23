@@ -10,15 +10,15 @@
 <form method="POST" action="{{ url_for('join_class') }}">
     <button type="submit" class="btn btn-primary">Join Class</button>
 </form>
-<form method="POST" action="{{ url_for('join_quiz', quiz_code=Student_name) }}">
-    <input type="text" name="Student_name" required>
-    <button type="submit">Join a Quiz</button>
+<form method="POST" action="#">
+    {{ form.hidden_tag() }}
+    {{ form.quiz_code.label }} {{ form.quiz_code() }}
+    {{ form.submit() }}
 </form>
-{% endif %}
 
+{% endif %}
 <div class="container-fluid">
     <div class="row">
-        
         <div class="col-md-9">
             <div class="row class-cards">
                 {% for classs in classes %}

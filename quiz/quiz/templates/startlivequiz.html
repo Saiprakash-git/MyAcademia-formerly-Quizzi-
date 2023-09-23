@@ -9,7 +9,11 @@
     {{quiz_code}}
 </p>
 
-
+<ul>
+    {% for student in students_in_quiz %}
+    <li>{{ student['username'] }}</li>
+    {% endfor %}
+</ul>
 
 
 
