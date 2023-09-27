@@ -1,7 +1,7 @@
 from quiz import app, db 
 from quiz.models import Class, Assignment, User, ClassStudent
 from quiz.forms import AddAssignment, AddClass, JoinClass
-from quiz.utils import classcode_generator , get_user_attempted_quizzes, get_users_with_assigned_quiz
+from quiz.utils import classcode_generator
 from flask_login import  current_user, logout_user, login_required
 from flask import  render_template, redirect, url_for, request, flash,  request
 
@@ -9,46 +9,44 @@ from flask import  render_template, redirect, url_for, request, flash,  request
 @app.route("/addclass", methods=['GET','POST'])
 @login_required
 def add_class(): 
-    user = User.query.filter_by(email=current_user.email).first()
     if request.method == 'POST':
-        if user.role == 'teacher' : 
-            form = AddClass() 
-            if form.validate_on_submit(): 
-                classcode = classcode_generator()
-                classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
-                db.session.add(classs)
-                db.session.commit()
-                flash('Class has been created','info')
-                return redirect(url_for('home'))
-        else: 
-            flash('Cannot create class for you account type','danger')
-            return redirect(url_for("home"))
-        return render_template("addclass.html",form=form)
+        form = AddClass() 
+        if form.validate_on_submit(): 
+            classcode = classcode_generator()
+            classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
+            db.session.add(classs)
+            db.session.commit()
+            flash('Class has been created','info')
+            return redirect(url_for('home'))
+        return render_template('addclass.html',form=form)
+        
 
 @app.route('/_class/<int:classid>')
 def class_info(classid):
+    creator = None
     classinfo = Class.query.get_or_404(classid)
+    if classinfo.creator_id == current_user.id:
+        creator = True
     user = User.query.filter_by(username=classinfo.username).first()
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
     quizzes = classinfo.quizzes
-    quizlog = {}  # Create an empty dictionary to store quiz log entries
+    # quizlog = {}  
     
-    # Iterate through the quizzes and retrieve the last attempt for each
-    for quiz in quizzes:
-        last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
-        if last_attempt:
-            quizlog[quiz.id] = last_attempt
+    # for quiz in quizzes:
+    #     last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
+    #     if last_attempt:
+    #         quizlog[quiz.id] = last_attempt
     
     participants = len(ClassStudent.query.filter_by(class_id=classid).all())
     
     #users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
         return render_template('classinfo.html',classinfo=classinfo, current_user=current_user,
-                                assignments=assignments,userassigns=userassigns,quizzes=quizzes,quizlog=quizlog, participants=participants)
+                                assignments=assignments,userassigns=userassigns,quizzes=quizzes, participants=participants, creator=creator)
 
 
-@app.route("/student/joinclass", methods=['GET','POST'])
+@app.route("/joinclass", methods=['GET','POST'])
 @login_required
 def join_class():
     user = User.query.filter_by(email=current_user.email).first()
@@ -64,8 +62,9 @@ def join_class():
                     enrolled_classes = current_user.classes_enrolled.all()
                     enrolled_classes.append(class_to_join)
                     current_user.classes_enrolled = enrolled_classes
+                    joined = ClassStudent(user_id=current_user.id, class_id=class_to_join.id)
                     #class_to_join.user_id = uid 
-                    
+                    db.session.add(joined)
                     db.session.commit()
                     flash('Successfully joined the class', 'success')
                 else:

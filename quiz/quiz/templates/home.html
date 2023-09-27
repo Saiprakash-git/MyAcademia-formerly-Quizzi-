@@ -2,26 +2,72 @@
 
 {% block content %}
 
-{% if user.role == 'teacher' %}
+
+
 <form method="post" action="{{ url_for('add_class') }}">
-    <button type="submit" class="btn btn-primary">Create Class</button>
+    <button type="submit" class="btn btn-primary" id="create">Create Class</button>
 </form>
-{% else %}
+
 <form method="POST" action="{{ url_for('join_class') }}">
-    <button type="submit" class="btn btn-primary">Join Class</button>
+    <button type="submit" class="btn btn-primary" id="create">Join Class</button>
 </form>
-<form method="POST" action="#">
+{% if user.role == 'student' %}
+<form method="POST"  onsubmit="joinQuiz(); return false;">
     {{ form.hidden_tag() }}
+    
     {{ form.quiz_code.label }} {{ form.quiz_code() }}
-    {{ form.submit() }}
+    <button type="submit" >Submit</button>
 </form>
 
 {% endif %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-20">
             <div class="row class-cards">
-                {% for classs in classes %}
+                {% for classs in created_classes %}
+                <div class="col-md-10">
+                    <div class="class-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <tr>
+                                    <td>
+                                      <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>
+                                    </td>
+                                    <td>
+                                        <div class="three-dots-button">
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                        <div class="dot"></div>
+                                      </div>
+                                      
+                                        <div class="threedot">
+                                      <div class="dropdown" style="display: inline-block;">
+                                        
+                                        <button  id="dropdownMenuButton" data-toggle="dropdown"   >
+                                            &vellip; <!-- Three dots entity -->
+                                        </button>
+                                    
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            
+                                          <a class="dropdown-item" href="{{ url_for('class_info', classid=classs.id) }}">View Details</a>
+                                          <a class="dropdown-item delete-class" data-classid="{{ classs.id }}" href="#">Delete</a>
+                                          <!-- Add more options as needed -->
+                                        </div>
+                                      </div>
+                                    </div>
+                                    </td>
+                                  </tr>
+                                <p class="card-text">{{ classs.class_code }}</p>
+                                <a href="{{ url_for('class_info', classid=classs.id) }}" class="btn btn-primary">Go to Class</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Teacher: {{ classs.username }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% for classs in joined_classes %}
                 <div class="col-md-4">
                     <div class="class-card">
                         <div class="card">
@@ -91,8 +137,9 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ quiz.title }}</h5>
                     <p class="card-text">{{ quiz.description }}</p>
-                    <p class="card-text">Due Date: {{ quiz.due_date }}</p>
-                    <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-primary">View Details</a>
+                    <p class="card-text">Code: {{ quiz.quiz_code }}</p>
+                    <!-- <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-primary">View Details</a> -->
+                    <a href="{{url_for('start_live_quiz',quiz_id=quiz.id)}}" class="btn btn-primary" target="_blank">start Now</a>
                 </div>
             </div>
             {% endfor %}
@@ -101,7 +148,5 @@
     </div>
 </div>
 
-<script> 
-
-</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}

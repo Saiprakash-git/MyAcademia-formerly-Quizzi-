@@ -1,4 +1,5 @@
 from flask import Flask, current_app
+from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -17,7 +18,7 @@ bcrypt = Bcrypt()
 login_manager = LoginManager(app) 
 login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
-
+socketio = SocketIO(app)
 
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com' 
 app.config['MAIL_PORT'] = 587
@@ -33,6 +34,7 @@ from quiz.Class import routes
 from quiz.quiz import routes 
 from quiz.assignment import routes
 
+    
 app_ctx = app.app_context()
 
 app_ctx.push()

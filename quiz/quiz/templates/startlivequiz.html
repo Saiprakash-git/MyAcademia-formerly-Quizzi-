@@ -1,20 +1,41 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>  Waiting Room ....
-    <br> {{quiztitle}}
-</h1>
 
-<p> 
-    Let participants join
-    {{quiz_code}}
-</p>
 
-<ul>
-    {% for student in students_in_quiz %}
-    <li>{{ student['username'] }}</li>
+<div >
+    <h2>Quiz</h2> 
+    
+    <fieldset class="participants"> 
+        {% for student in students_in_quiz %}
+    <div class="participant-container">
+        <img class="participant-image" src="{{image_file}}" alt="Participant Image">
+        <div class="participant-name">{{ student['username'] }}</div>
+    </div>
+    
     {% endfor %}
-</ul>
+    </fieldset>
+<div class="quiz-room">
+    <h1>{{ quiztitle }}---QuIz</h1>
+    <p>Let participants join {{ quiz_code }}</p>
+    <small>refresh to see updated content</small>
+    
+    
+    
+<h4> {{participants}}</h4>
+<a href="{{url_for('exit_quiz')}}" class="btn btn-primary" id="exitquiz">EXIT</a>
+  
+    
 
+{% if current_user.role == 'teacher' %}
+<form method="GET" action='/running_quiz'>
+    <input type="text" name="quiz_code" value="{{ quiz_code }}" style="display: none;">
+    <button type="submit" class="btn btn-primary">Start Quiz</button>
+</form>
+{% endif %}
 
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+    
 
 {% endblock content %}
