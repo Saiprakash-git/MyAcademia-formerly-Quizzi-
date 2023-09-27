@@ -11,8 +11,8 @@
     <button type="submit" class="btn btn-primary">Join Class</button>
 </form>
 <form method="POST" action="#">
-    {{ form.hidden_tag() }}
-    {{ form.quiz_code.label }} {{ form.quiz_code() }}
+   <pre>   {{ form.hidden_tag() }}   </pre>
+   <pre> {{ form.quiz_code.label }}    {{ form.quiz_code() }} </pre>
     {{ form.submit() }}
 </form>
 
