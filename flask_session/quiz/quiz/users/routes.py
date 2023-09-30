@@ -26,7 +26,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter(
-            or_(User.username == form.username.data, User.pin == form.username.data)
+            or_(User.username == form.username.data)
         ).first()
 
         
@@ -36,13 +36,12 @@ def login():
             session['current_user'] = { 
                 'id':user.id,
                 'username':user.username, 
-                'pin':user.pin,
                 'email':user.email,
-                'role':user.role
+                
             }
             return redirect(next_page) if next_page else redirect(url_for('home'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful', 'danger')
     return render_template('login.html', title='Login', form=form)
     
 

@@ -14,12 +14,11 @@ class ClassStudent(db.Model):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    pin = db.Column(db.String(12), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String(10), nullable=False)
     password = db.Column(db.String(60), nullable=False)
     classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic')
     quizzes = db.relationship('LiveQuiz', backref='user', lazy=True)
+    quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts',lazy='dynamic')
     assignments = db.relationship('Assignment', backref='user', lazy=True)
 
 class Class(db.Model):
@@ -47,7 +46,7 @@ class Quiz(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
     quiz_code = db.Column(db.String(5), nullable=False, unique=True)
     title = db.Column(db.String(100), nullable=False)
-    timer = db.Column(db.Integer)  # Default timer in seconds
+    timer = db.Column(db.Integer)  
     questions = db.relationship('Question', backref='quiz', lazy=True)
     options = db.relationship('Option', backref='quiz', lazy=True)
 
@@ -104,6 +103,6 @@ class QuizAttempts(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     quiz_id = db.Column(db.Integer,db.ForeignKey('quiz.id'), nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    quiz_code = db.Column(db.Integer, nullable=False, unique=True)
+    quiz_code = db.Column(db.Integer, nullable=False)
     time = db.Column(db.DateTime, default=datetime.utcnow)
-    score = db.Column(db.Integer, nullable=False)
+    
