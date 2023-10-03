@@ -67,6 +67,8 @@ class Question(db.Model):
     text = db.Column(db.String(500), nullable=False)
     options = db.relationship('Option', backref='question', lazy=True)
 
+    
+
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
@@ -95,6 +97,19 @@ class LiveQuiz(db.Model):
 
     def __repr__(self):
             return f"LiveQuiz('quiz_id:{self.quiz_id}','quiz_code:{self.quiz_code}')"
+    
+class QuizLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entered_answer = db.Column(db.String(200), nullable=False)
+    correct_answer = db.Column(db.String(200), nullable=False)
+    total_marks = db.Column(db.Integer, nullable=False)
+    
+    def __repr__(self):
+        return f"QuizLog('Quiz ID: {self.quiz_id}', 'Student ID: {self.student_id}', 'Entered Answer: {self.entered_answer}', 'Correct Answer: {self.correct_answer}', 'Total Marks: {self.total_marks}')"
+
+
     
 class QuizAttempts(db.Model):
     id = db.Column(db.Integer,primary_key=True)
