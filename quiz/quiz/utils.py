@@ -49,6 +49,10 @@ def get_users_with_assigned_quiz(class_id):
 
     return users_with_assigned_quiz
 
+def get_user_attempted_quizzes(user,quiz): 
+    
+    # If a record exists, return the timestamp of the last attempt, otherwise return None
+    return 0
 
 def check_class_code(classcode): 
     classs = Class.query.filter_by(class_code=classcode).first()

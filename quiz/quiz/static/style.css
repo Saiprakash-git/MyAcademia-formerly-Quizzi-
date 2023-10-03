@@ -1,3 +1,4 @@
+<<<<<<< HEAD:quiz/quiz/static/style.css
 
 hr {color: black;
   height: 1px;
@@ -106,6 +107,30 @@ max-width: 50%;
     margin-top: 20px;
     padding: 2px;
     overflow: hidden;
+=======
+
+
+body {
+    
+    background-attachment: fixed;
+    color: #333333;
+    margin-top: 0rem;
+    
+
+  }
+
+  .card{ 
+    background-color: rgba(108, 106, 106, 0.5); /* Change the last value (0.5) to control opacity */
+    border: 1px solid #a19292; /* Add a border for visibility */
+  }
+
+  .threedot {
+    background-color: inherit;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+>>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/static/style.css
   }
  
   .custom-row {
@@ -303,6 +328,7 @@ label{
 }
 #startLaterButton{ 
   color: #ffffff;
+<<<<<<< HEAD:quiz/quiz/static/style.css
 }
 
 body {
@@ -423,3 +449,6 @@ h1 {
   margin-bottom: 10px;
   
 }
+=======
+}
+>>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/static/style.css

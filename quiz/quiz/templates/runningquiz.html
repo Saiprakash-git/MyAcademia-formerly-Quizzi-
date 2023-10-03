@@ -1,14 +1,13 @@
-
-
 {% extends "layout.html" %}
 {% block content %}
-  <h1>Quiz: {{ quiztitle }}</h1>
+  <h1>Quiz: {{ quiz.title }}</h1>
   <form method="POST" id="quiz-form">
     {% for question in questions %}
       <div class="question">
         <p>{{ question.text }}</p>
         <ul>
-          {% for option in question.options %}
+          {% set shuffled_options = question.options|random %}
+          {% for option in shuffled_options %}
             <li>
               <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
               {{ option.option_text }}

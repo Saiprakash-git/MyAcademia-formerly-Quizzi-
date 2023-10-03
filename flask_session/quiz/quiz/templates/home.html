@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+{% if user.role == 'teacher' %}
+<form method="post" action="{{ url_for('add_class') }}">
+    <button type="submit" class="btn btn-primary">Create Class</button>
+</form>
+{% else %}
+<form method="POST" action="{{ url_for('join_class') }}">
+    <button type="submit" class="btn btn-primary">Join Class</button>
+</form>
+<form method="POST" action="#">
+   <pre>   {{ form.hidden_tag() }}   </pre>
+   <pre> {{ form.quiz_code.label }}    {{ form.quiz_code() }} </pre>
+    {{ form.submit() }}
+</form>
+
+{% endif %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="row class-cards">
+                {% for classs in classes %}
+                <div class="col-md-4">
+                    <div class="class-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <tr>
+                                    <td>
+                                      <h4 style="display: inline-block;"><a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a></h4>
+                                    </td>
+                                    <td>
+                                        <div class="threedot">
+                                      <div class="dropdown" style="display: inline-block;">
+                                        
+                                        <button  id="dropdownMenuButton" data-toggle="dropdown"   >
+                                            &vellip; <!-- Three dots entity -->
+                                        </button>
+                                    
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                          <a class="dropdown-item" href="{{ url_for('class_info', classid=classs.id) }}">View Details</a>
+                                          <a class="dropdown-item delete-class" data-classid="{{ classs.id }}" href="#">Delete</a>
+                                          <!-- Add more options as needed -->
+                                        </div>
+                                      </div>
+                                    </div>
+                                    </td>
+                                  </tr>
+                                <p class="card-text">{{ classs.class_code }}</p>
+                                <a href="{{ url_for('class_info', classid=classs.id) }}" class="btn btn-primary">Go to Class</a>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Teacher: {{ classs.username }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Quiz Frame -->
+        <div class="col-md-3">
+            <div class="quiz-frame">
+                {% if user.role == 'teacher' %}
+                <form method="post" action="{{ url_for('add_livequiz') }}">
+                    <button type="submit" class="btn btn-primary">Live Quiz</button>
+                </form>
+                <div class="quiz-container">
+                    <div class="quizzescard">
+                        <div class="card-content">
+                           
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Quizzes</h3>
+            {% if quizzes %}
+            {% for quiz in quizzes %} 
+            
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ quiz.title }}</h5>
+                    <p class="card-text">{{ quiz.description }}</p>
+                    <p class="card-text">Due Date: {{ quiz.due_date }}</p>
+                    <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif%}
+        </div>
+    </div>
+</div>
+
+<script> 
+
+</script>
+{% endblock %}

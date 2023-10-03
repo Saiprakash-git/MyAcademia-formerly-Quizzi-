@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-
 <div class="classinfoo">
+<<<<<<< HEAD:quiz/quiz/templates/classinfo.html
 <div  >
     <div class="class-info-container">
         
@@ -125,9 +125,69 @@
                                 {% endfor %}
                             </div>
                             
+=======
+<div class="content-section" id="classinfo">
+{% if current_user.role == 'teacher' %}
+<form method="POST" enctype="multipart/form-data">
+<div class="bg">
+    <div class="container">
+    <h2><b>{{ classinfo.class_name }}</b></h2>
+    <p> code: {{ classinfo.class_code }}</p>
+    
+    <p>Total Number of Participants: {{ participants}}</p>
+    <div class="dropdown">
+       
+        
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Add
+        </button>
+        <form action="#" method="post">
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{{ url_for('add_assignment') }}">Assignment</a>
+           
+    </div>
+    </div>
+    </div>
+    </div>
+    <div class="col-md-3">
+        <div class="quiz-frame">
+         </form>
+            <form method="post" action="{{ url_for('add_quiz') }}">
+                <button type="submit" class="btn btn-primary"  >Create Quiz</button>
+            </form>
+            
+        
+        </div>
+    </div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Assignments</h3>
+        {% for assignment in assignments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <a href="{{url_for('assignment_details',assignment_id=assignment.id)}}">{{ assignment.title}}</a>
+                    <p class="card-text">{{assignment.description}} </p>
+                    <p class="card-text"> Due : {{assignment.due_date }}</p>
+    
+                
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {% for quiz in quizzes %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+>>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/templates/classinfo.html
                           
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
+                            <p class="card-text">code: {{quiz.quiz_code}}</p>
+                            <a href="{{url_for('quiz_result',quiz_id=quiz.id)}}" class="btn btn-primary">Get results</a>
+                            <p class="card-text"> </p>
                         </div>
                     </div>
+<<<<<<< HEAD:quiz/quiz/templates/classinfo.html
                     </form>
                     {% endif %}
             </div>
@@ -196,4 +256,69 @@
   
   
   </script>
+=======
+                    {% endfor %}
+           
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% if current_user.role == 'student' %}
+<div class="bg">
+    <div class="container">
+    <h2><b>{{ classinfo.class_name }}</b></h2>
+    <p> {{ classinfo.class_code }}</p>
+    <div class="dropdown">
+        <form action="{{url_for('exit_class',user_id=current_user.id, class_id=classinfo.id)}}">
+            <button class="btn btn-primary">Exit class</button>
+        </form>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Assignments</h3>
+                {% for assignment in userassigns %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a href="{{url_for('assignment_details',assignment_id=assignment.id)}}">{{ assignment.title}}</a>
+                            <p class="card-text">{{assignment.description}} </p>
+                            <p class="card-text"> Due : {{assignment.due_date }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+               
+                <div class="col-md-6">
+                    <h3>Quizzes</h3>
+                    {% for quiz in quizzes %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{ quiz.title }}</a>
+                            <p class="card-text">code: {{ quiz.quiz_code }}</p>
+                            
+                            {% if quiz.id in quizlog %}
+                                <p class="card-text">Previous Result: {{ quizlog[quiz.id].total_marks }}</p>
+                                <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                    <button class="btn btn-secondary">Re-attempt</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                    <button class="btn btn-secondary">Attempt quiz</button>
+                                </form>
+                            {% endif %}
+                            
+                            <p class="card-text"> </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+              
+            </div>
+        </div>
+        </form>
+        {% endif %}
+</div>
+</div>
+>>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/templates/classinfo.html
 {% endblock %}
