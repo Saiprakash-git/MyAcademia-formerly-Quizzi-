@@ -6,7 +6,6 @@
         <div class="media-body">
           <h2 class="account-heading">{{ current_user.username }}</h2>
           <p class="text-secondary">{{ current_user.email }}</p>
-          <p class="text-secondary">{{ current_user.role }}-{{current_user.pin}}</p>
         </div>
       </div>
         <form method="POST" action="" enctype="multipart/form-data">
@@ -40,37 +39,7 @@
                         {{ form.email(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
-                <div class="form-group">
-                    {{ form.pin.label(class="form-control-label") }}
-                    {% if form.pin.errors %}
-                        {{ form.pin(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.pin.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.pin(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.role.label(class="form-control-label") }}
-                    {% if form.role.errors %}
-                        <div class="form-select">
-                        <option selected disabled value="">Choose...
-                        {{ form.role(class="form-control form-control-lg is-invalid") }}
-                        </option>
-                        </div>
-                        <div class="invalid-feedback">
-                            {% for error in form.role.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.role(class="form-control form-control-lg") }}
-                    {% endif %}
-                </div>
-
+            
                
             </fieldset>
             <div class="form-group">

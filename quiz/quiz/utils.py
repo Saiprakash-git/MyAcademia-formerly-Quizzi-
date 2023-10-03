@@ -1,10 +1,18 @@
 import random
 import string
-from quiz.models import Class, Quiz
+from quiz.models import Class, Quiz, ClassStudent,User
 from flask_mail import Message
 from flask import url_for
 from quiz import  mail
 
+def get_people(classid):
+    people = []
+    classpeople = ClassStudent.query.filter_by(class_id=classid).all()
+    for p in classpeople:
+        data = User.query.get_or_404(p.user_id)
+        people.append(data)
+
+    return people
 
 def assignment_added_email(user, title,msgbody):
     msg = Message(title,

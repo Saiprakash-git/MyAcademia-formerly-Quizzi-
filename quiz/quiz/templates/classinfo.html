@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="classinfoo">
-<div  id="classinfo">
+<div  >
     <div class="class-info-container">
         
         <div class="mini-navbar">
@@ -11,40 +11,33 @@
           
         </div><hr>  
         <div class="class-content tab-content tab1">
-            {% if creator %}
-
-    
-            <form method="POST" enctype="multipart/form-data">
+            {% if classinfo.creator_id == current_user.id %}
             <div class="bg">
-                <div class="container">
+                
+                <div class="container" >
+               <div id="classinfo">
                 <h2><b>{{ classinfo.class_name }}</b></h2>
                 <p> code: {{ classinfo.class_code }}</p>
                 
-                <p>Total Number of Participants: {{ participants}}</p>
+                <p><img src="{{url_for('static', filename='participants.png')}}" style="border-radius: 30px;"> {{ participants}}</p>
                 <div class="dropdown">
-                   
-                    
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Add
                     </button>
-                    <form action="#" method="post">
+                    
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="{{ url_for('add_assignment') }}">Assignment</a>
+                        <form method="POST" action="{{ url_for('add_livequiz') }}">
+                            <input type="hidden" name="class_id" value="{{ classinfo.id }}">
+                            <button type="submit" class="dropdown-item"> Quiz</button>
+                        </form>
                        
                 </div>
+            </div>
                 </div>
                 </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="quiz-frame">
-                     </form>
-                        <form method="post" action="{{ url_for('add_quiz') }}">
-                            <button type="submit" class="btn btn-primary"  >Create Quiz</button>
-                        </form>
-                        
-                    
-                    </div>
-                </div>
+                
             <div class="container mt-4">
                 <div class="row">
                     <div class="col-md-6">
@@ -78,19 +71,23 @@
                 </div>
             </div>
             
-            
+
             {% else %}
             <div class="bg">
                 <div class="container">
+            <div id="classinfo">
                 <h2><b>{{ classinfo.class_name }}</b></h2>
                 <p> {{ classinfo.class_code }}</p>
-                <div class="dropdown">
+                
+             
                     <form action="{{url_for('exit_class',user_id=current_user.id, class_id=classinfo.id)}}">
                         <button class="btn btn-primary">Exit class</button>
                     </form>
+                </div>
                     <div class="container mt-4">
                         <div class="row">
                             <div class="col-md-6">
+                           
                                 <h3>Assignments</h3>
                             {% for assignment in userassigns %}
                                 <div class="card mb-3">
@@ -133,12 +130,29 @@
                     </div>
                     </form>
                     {% endif %}
-            </div></div>
-        <div class="class-content tab-content tab2">Participants</div>
-      </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="class-content tab-content tab2">
+            {% if participants %}
+            <div>
+                <p> Participants: {{ participants }}</p>
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        {% for p in people %}
+                            <li class="list-group-item">{{ p.username }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
       
 
-</div>
+
+
 <script>// Get references to the buttons and content
     // Get references to the links and content
   // Get references to the links and content

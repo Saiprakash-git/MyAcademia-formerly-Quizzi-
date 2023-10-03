@@ -60,7 +60,9 @@ def download_attachment(filename):
 @app.route('/assignment/<int:assignment_id>')
 def assignment_details(assignment_id):
     assignment = Assignment.query.get_or_404(assignment_id)
-    return render_template('assignmentdetails.html', assignment=assignment, current_user=current_user)
+    if assignment.file_attachment:
+        filename = os.path.basename(assignment.file_attachment)
+    return render_template('assignmentdetails.html', assignment=assignment, current_user=current_user, filename=filename)
 
 @app.route('/<int:assignment_id>/delete')
 def delete_assignment(assignment_id): 

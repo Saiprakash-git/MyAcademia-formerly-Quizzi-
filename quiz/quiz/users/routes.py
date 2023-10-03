@@ -11,7 +11,7 @@ def register():
     
     if form.validate_on_submit():   
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data,pin=form.pin.data, email=form.email.data, role = form.role.data, password=hashed_password)
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -54,16 +54,12 @@ def logout():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account(): 
-    if current_user.role == 'teacher':
-        image_file = url_for('static', filename='profiles/' + 'teacher_logo.jpg')
-    if current_user.role == 'student':
-        image_file = url_for('static', filename='profiles/' + 'student_b.jpg')
+    image_file = url_for('static', filename='profiles/' + 'teacher_logo.jpg')
     form = UpdateAccount() 
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.email = form.email.data
-        current_user.pin = form.pin.data
-        current_user.role = form.role.data
+    
         db.session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
@@ -77,4 +73,4 @@ def delete_account(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit() 
-    return redirect(url_for('firstpage'))
+    return redirect(url_for('register'))

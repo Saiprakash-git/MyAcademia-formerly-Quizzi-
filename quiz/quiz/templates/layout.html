@@ -78,7 +78,7 @@
   </head>
 <body>
 <header class="site-header">
-
+  <div class="overlay" id="overlay" onclick="closeQuizModal()"> </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navbar">
           {% if current_user.is_authenticated %}
           <a class="navbar-brand" href="{{url_for('home')}}">Quizzi</a>
@@ -102,8 +102,40 @@
             <li class="nav-item">
               <a class="nav-link " href="{{ url_for('account') }}" tabindex="-1" aria-disabled="true">Account</a>
             </li>
-            <li class="nav-item"><a class="nav-link "tabindex="-1" aria-disabled="true">{{username}}</a></li>
+            <li class="nav-item"><a class="nav-link "tabindex="-1" aria-disabled="true">{{ current_user.username}}</a></li>
             
+            <li ><!-- Add this button to your HTML where you want the + symbol -->
+              <div class="btn-group" style=" margin-left: 600px; margin-right: 10px;">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    +
+                </button>
+                <div class="dropdown-menu" >
+                    <form method="post" action="{{ url_for('add_class') }}">
+                        <button type="submit" class="dropdown-item" >Create Class</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('join_class') }}">
+                        <button type="submit" class="dropdown-item" id="create">Join Class</button>
+                    </form>
+                    
+                      <!-- Modal content goes here -->
+                      <form method="post" action="#">
+                        <input type="hidden" name="class_id" value="None">
+                        
+                          <button type="button" class="dropdown-item" onclick="openQuizModal()">Create Quiz</button>
+                     
+                        </form>
+  
+                     
+                </div>
+            </div>
+              </li>
+              <li>
+            <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+          </div>
+        </li>
             {% else %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('register') }}">register</a>
@@ -117,13 +149,24 @@
             {% endif %}
             
           </ul>
-          <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form>
-        </div>
+        
       </nav>
-
+      <div class="centered-card" id="quizModal"> 
+        <div class="card-body">
+        <div class="card-text">  
+          You can create a Quiz for a class, Go through the class to conduct quiz for a class
+          <br>
+          <a href="{{url_for('home')}}" class="btn btn-">Back</a>
+          
+            <input type="hidden" name="class_id" value="None">
+            
+            <a  href="{{url_for('add_livequiz')}}" class="btn btn-outline-success" onclick="openQuizModal()">Continue</a>
+         
+          </div>
+          
+        </div>
+      </div>
+    
       <main role="main" id="layout" class="container">
         <div class="row">
           <div class="col-md-8">
@@ -155,6 +198,30 @@
       });
     });
 
+// Function to open the modal
+function openQuizModal() {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  quizModal.style.display = 'block';
+  overlay.style.display = 'block';
+}
+
+// Function to close the modal
+function closeQuizModal() {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  quizModal.style.display = 'none';
+  overlay.style.display = 'none';
+}
+
+// Close the modal if the dimmed background is clicked
+window.addEventListener('click', (event) => {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  if (event.target === overlay) {
+    closeQuizModal(); // Call the close function
+  }
+});
 
 
     

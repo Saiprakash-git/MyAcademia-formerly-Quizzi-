@@ -1,15 +1,49 @@
+
 hr {color: black;
+  height: 1px;
     background: black;}
-  .three-dots-button {
-    display: inline-block;
-    position: relative;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-  }
- 
-.mini-navbar {
   
+
+ #classinfo{ 
+  border-radius: 8px;
+  max-width: 100%;
+  padding: 20px;
+  background-image: url(blue.jpg);
+  background-size: cover;
+  
+}
+
+
+
+#join_quiz {
+max-width: 50%;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: fixed;
+  top: 50px; /* Adjust the top value to your desired vertical position */
+  right: 60px; /* Adjust the right value to your desired horizontal position */
+ 
+  padding: 10px; /* Add padding for better styling */
+  border: 1px solid #ccc; /* Add a border   for better visibility */
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); /* Add a shadow for a card-like appearance */
+  z-index: 999; /* Ensure it appears above other elements */
+}
+
+#uploadassignment{ 
+  font-size: medium;
+  position: fixed;
+  max-width: 60%;
+  top: 140px;
+  right: 560px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  z-index: 669;
+}
+
+.mini-navbar {
   background-color: #fff; /* Navbar background color */
   padding: 10px;
 }
@@ -22,11 +56,12 @@ hr {color: black;
   transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out;
   position: relative;
 }
+
 .class-nav:hover {
   text-decoration: none;
   background-color:#dddddd
+  }
   
-}
 /* Style for the active link */
 .class-nav.active::after {
   content: '';
@@ -41,9 +76,7 @@ hr {color: black;
 }
 
 
-/* Add more link styles as needed */
 
-  /* Add more link */
   .dot {
     width: 6px;
     height: 6px;
@@ -66,26 +99,69 @@ hr {color: black;
       opacity: 0.3;
     }
   }
-  
+
   .card{ 
     background-color:#ffffff; /* Change the last value (0.5) to control opacity */
-    /* border: 2px solid #a19292;  */
-  }
-
-  .threedot {
-    background-color: inherit;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
+    border: 2px solid #a19292; 
+    margin-top: 20px;
+    padding: 2px;
+    overflow: hidden;
   }
  
-  .bg-steel {
+  .custom-row {
+    /* Your custom row styles here */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.custom-col {
+    /* Your custom column styles here */
+    flex: 1;
+    margin: 10px;
+    /* Adjust width and margin as needed */
+}
+
+ 
+  .classdd {
+ 
+    position: fixed;
+    /* Ensure it appears above other elements */
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Style for the three-dot button */
+.dot-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Style for the dropdown content */
+.classdd-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown content links */
+.classdd-content a {
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    color: #333;
+}
+
+.bg-steel {
     background-color: #5f788a;
     background-color: black;
   }
   
-  .site-header .navbar-nav .nav-link {
+.site-header .navbar-nav .nav-link {
     color: black
    
   }
@@ -218,6 +294,10 @@ label{
   z-index: 3;
 }
 
+.quiz-modal-content{ 
+  max-width: 90%;
+  padding: 20px;
+}
 #startNowButton{ 
   color: white;
 }
@@ -225,14 +305,12 @@ label{
   color: #ffffff;
 }
 
-container{ 
-  margin: 0;
-}
 body {
   font-family: Arial, sans-serif;
   background-color: #fff;
-  margin: 0;
+
   padding: 0;
+  margin-top: 20px;
 }
 
 .participants{
@@ -242,7 +320,8 @@ body {
 .quiz-room {
   text-align: center;
   margin: 20px auto;
-  margin-left: 500px;
+  left: 10px;
+
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;

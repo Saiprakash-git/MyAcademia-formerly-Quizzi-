@@ -3,10 +3,10 @@
 
 <div class="overlay" id="overlay" onclick="closeModal()"></div>
 
-<div class="centered-card" id="quizModal">
+<div class="centered-card" id="startquizModal">
     <h5 class="card-title">Start Your Quiz</h5>
     <p class="card-text">Click the "Start Now" button to begin the quiz immediately or "Later" to schedule it for later{{quiz_id}}.</p>
-    <button type="button" class="btn btn-primary" id="startNowButton" onclick="startNow()" ><a href="{{url_for('start_live_quiz', quiz_id=quiz_id)}}" target="_blank">Start Now</a></button>
+    <button type="button" class="btn btn-primary" id="startNowButton" onclick="startNow()"><a href="{{url_for('start_live_quiz', quiz_id=quiz_id)}}" target="_blank">Start Now</a></button>
     <button type="button" class="btn btn-secondary" id="startLaterButton" onclick="later()"><a href="{{url_for('home')}}">Later</a></button>
 </div> 
 
@@ -14,13 +14,13 @@
     // Function to open the modal and overlay
     function openModal() {
         document.getElementById("overlay").style.display = "block";
-        document.getElementById("quizModal").style.display = "block";
+        document.getElementById("startquizModal").style.display = "block";
     }
     
     // Function to close the modal and overlay
     function closeModal() {
         document.getElementById("overlay").style.display = "none";
-        document.getElementById("quizModal").style.display = "none";
+        document.getElementById("startquizModal").style.display = "none";
     }
 
     // Function to handle "Start Now" button click

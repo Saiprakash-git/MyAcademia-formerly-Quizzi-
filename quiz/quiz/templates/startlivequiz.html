@@ -14,9 +14,10 @@
     
     {% endfor %}
     </fieldset>
+
 <div class="quiz-room">
     <h1>{{ quiztitle }}---QuIz</h1>
-    <p>Let participants join {{ quiz_code }}</p>
+    <p>Let participants join <p name="quiz_code">{{ livequiz.quiz_code }}</p></p>
     <small>refresh to see updated content</small>
     
     
@@ -26,9 +27,9 @@
   
     
 
-{% if current_user.role == 'teacher' %}
-<form method="GET" action='/running_quiz'>
-    <input type="text" name="quiz_code" value="{{ quiz_code }}" style="display: none;">
+{% if livequiz.creator_id == current_user.id %}
+<form action="{{ url_for('running_quiz', quiz_code= livequiz.quiz_code) }}">
+    <!-- <input type="text" name="quiz_code" value="{{ quiquiz_code }}" style="display: none;"> -->
     <button type="submit" class="btn btn-primary">Start Quiz</button>
 </form>
 {% endif %}

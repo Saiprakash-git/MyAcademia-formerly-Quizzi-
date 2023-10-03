@@ -10,11 +10,9 @@ from flask_login import current_user
 class RegistrationForm(FlaskForm): 
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
-    role = SelectField('Role', choices=[('choose', 'Choose...'),('teacher', 'Teacher'), ('student', 'Student')])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    pin = StringField('Pin',validators=[ Length(min=10,max=12)])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
@@ -64,9 +62,7 @@ class AddAssignment(FlaskForm):
     assignmentdescription = TextAreaField('assignmentdescription',validators=[DataRequired()])
     duedate = DateField('due_date', format='%Y-%m-%d', validators=[DataRequired()])
     attachment = FileField('Attachment')
-    # Add the QuerySelectField to select the class
-    class_id = SelectField('Class', coerce=int)  
-    
+    class_id = SelectField('Class', coerce=int)      
     submit = SubmitField('Add Assignment')
 
 class UpdateAccount(FlaskForm): 
@@ -74,8 +70,6 @@ class UpdateAccount(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    pin = StringField('Pin',validators=[DataRequired(), Length(min=10,max=12)])
-    role = SelectField('Role', choices=[('teacher', 'Teacher'), ('student', 'Student')])
     submit = SubmitField('Update')
 
     def validate_username(self, username):

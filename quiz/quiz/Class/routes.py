@@ -1,7 +1,7 @@
 from quiz import app, db 
 from quiz.models import Class, Assignment, User, ClassStudent
 from quiz.forms import AddAssignment, AddClass, JoinClass
-from quiz.utils import classcode_generator
+from quiz.utils import classcode_generator, get_people
 from flask_login import  current_user, logout_user, login_required
 from flask import  render_template, redirect, url_for, request, flash,  request
 
@@ -23,10 +23,7 @@ def add_class():
 
 @app.route('/_class/<int:classid>')
 def class_info(classid):
-    creator = None
     classinfo = Class.query.get_or_404(classid)
-    if classinfo.creator_id == current_user.id:
-        creator = True
     user = User.query.filter_by(username=classinfo.username).first()
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
@@ -39,11 +36,11 @@ def class_info(classid):
     #         quizlog[quiz.id] = last_attempt
     
     participants = len(ClassStudent.query.filter_by(class_id=classid).all())
-    
+    people = get_people(classid)
     #users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
         return render_template('classinfo.html',classinfo=classinfo, current_user=current_user,
-                                assignments=assignments,userassigns=userassigns,quizzes=quizzes, participants=participants, creator=creator)
+                                assignments=assignments,userassigns=userassigns,quizzes=quizzes, participants=participants,  people=people)
 
 
 @app.route("/joinclass", methods=['GET','POST'])
@@ -78,8 +75,11 @@ def join_class():
 
 @app.route('/class<int:class_id>/remove<int:user_id>')
 def exit_class(user_id, class_id): 
-    user = User.query.get(user_id)
-    classs = Class.query.get(class_id)
-    user.classes.remove(classs)
+   
+    classstu_instance = ClassStudent.query.filter_by(user_id=user_id,class_id=class_id).first()
+    db.session.delete(classstu_instance)
     db.session.commit()
     return redirect(url_for('home'))
+
+# @app.route('/delete_class/')
+# def 
