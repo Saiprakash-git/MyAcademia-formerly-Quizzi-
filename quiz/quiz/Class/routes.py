@@ -1,11 +1,7 @@
 from quiz import app, db 
 from quiz.models import Class, Assignment, User, ClassStudent
 from quiz.forms import AddAssignment, AddClass, JoinClass
-<<<<<<< HEAD:quiz/quiz/Class/routes.py
 from quiz.utils import classcode_generator, get_people
-=======
-from quiz.utils import classcode_generator , get_user_attempted_quizzes, get_users_with_assigned_quiz
->>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/Class/routes.py
 from flask_login import  current_user, logout_user, login_required
 from flask import  render_template, redirect, url_for, request, flash,  request
 
@@ -36,24 +32,18 @@ def class_info(classid):
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
     quizzes = classinfo.quizzes
-    quizlog = {}  # Create an empty dictionary to store quiz log entries
-    
-    # Iterate through the quizzes and retrieve the last attempt for each
-    for quiz in quizzes:
-        last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
-        if last_attempt:
-            quizlog[quiz.id] = last_attempt
+    # quizlog = {}  
+    # for quiz in quizzes:
+    #     last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
+    #     if last_attempt:
+    #         quizlog[quiz.id] = last_attempt
     
     participants = len(ClassStudent.query.filter_by(class_id=classid).all())
     people = get_people(classid)
     #users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
         return render_template('classinfo.html',classinfo=classinfo, current_user=current_user,
-<<<<<<< HEAD:quiz/quiz/Class/routes.py
                                 assignments=assignments,userassigns=userassigns,quizzes=quizzes, participants=participants,  people=people)
-=======
-                                assignments=assignments,userassigns=userassigns,quizzes=quizzes,quizlog=quizlog, participants=participants)
->>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/Class/routes.py
 
 
 @app.route("/student/joinclass", methods=['GET','POST'])

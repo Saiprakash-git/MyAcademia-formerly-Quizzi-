@@ -14,11 +14,8 @@ class ClassStudent(db.Model):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
-    pin = db.Column(db.String(12), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String(10), nullable=False)
     password = db.Column(db.String(60), nullable=False)
-<<<<<<< HEAD:quiz/quiz/models.py
     classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic', cascade="all, delete-orphan")
     quizzes = db.relationship('LiveQuiz', backref='user', lazy=True, cascade="all, delete-orphan")
     quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts', lazy='dynamic', cascade="all, delete-orphan")
@@ -28,11 +25,6 @@ class User(db.Model, UserMixin):
     # quizzes = db.relationship('LiveQuiz', backref='user', lazy=True)
     # quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts',lazy='dynamic')
     # assignments = db.relationship('Assignment', backref='user', lazy=True)
-=======
-    classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic')
-    quizzes = db.relationship('LiveQuiz', backref='user', lazy=True)
-    assignments = db.relationship('Assignment', backref='user', lazy=True)
->>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/models.py
 
 class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,7 +57,7 @@ class Quiz(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
     quiz_code = db.Column(db.String(5), nullable=False, unique=True)
     title = db.Column(db.String(100), nullable=False)
-    timer = db.Column(db.Integer)  # Default timer in seconds
+    timer = db.Column(db.Integer)  
     questions = db.relationship('Question', backref='quiz', lazy=True)
     options = db.relationship('Option', backref='quiz', lazy=True)
 
@@ -122,16 +114,3 @@ class QuizLog(db.Model):
     
     def __repr__(self):
         return f"QuizLog('Quiz ID: {self.quiz_id}', 'Student ID: {self.student_id}', 'Entered Answer: {self.entered_answer}', 'Correct Answer: {self.correct_answer}', 'Total Marks: {self.total_marks}')"
-<<<<<<< HEAD:quiz/quiz/models.py
-=======
-
-
-    
-class QuizAttempts(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    quiz_id = db.Column(db.Integer,db.ForeignKey('quiz.id'), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    quiz_code = db.Column(db.Integer, nullable=False, unique=True)
-    time = db.Column(db.DateTime, default=datetime.utcnow)
-    score = db.Column(db.Integer, nullable=False)
->>>>>>> parent of df5ee05 (Merge branch 'main' of https://github.com/Saiprakash-git/quiz_on_working):flask_session/quiz/quiz/models.py

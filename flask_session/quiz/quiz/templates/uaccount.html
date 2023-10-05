@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Account Information</h2>
+    <form method="POST">
+      <img class="rounded-circle account-img" src="{{ image_file }}">
+
+
+        <h4> {{ current_user.username }}!</h4>
+        
+        <div class="account-info">
+            
+            <p><strong>Username:</strong> {{ current_user.username }}</p>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p><strong>Role:</strong> {{ current_user.role }}</p>
+        </div>
+        
+        <div class="additional-options">
+            
+            <h2>Additional Options</h2>
+            
+            <div class="container mt-4">
+                <div class="row justify-content-end">
+                    <div class="col-auto">
+                        <a class="btn btn-primary" href="{{url_for('update_account')}}">Update Account?</a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if current_user.role == 'teacher' %}
+                <p><a href="{{ url_for('add_assignment') }}">Create Assignment</a></p>
+                <p><a href="#">Manage Classes</a></p>
+            {% endif %}
+            <!-- Add more role-specific options here -->
+        </div>
+
+    </main>
+    
+    <footer style="text-align: center;">
+        Created and Managed by ASP.co
+    </footer>
+</form>
+    <!-- Include your JavaScript scripts here -->
+
+    {% endblock  %}

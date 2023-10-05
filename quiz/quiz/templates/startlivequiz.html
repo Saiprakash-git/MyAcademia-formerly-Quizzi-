@@ -28,7 +28,7 @@
     
 
 {% if livequiz.creator_id == current_user.id %}
-<form action="{{ url_for('running_quiz', quiz_code= livequiz.quiz_code) }}">
+<form action="{{ url_for('running_quiz', quiz_code= livequiz.quiz_code) }}" method="post">
     <!-- <input type="text" name="quiz_code" value="{{ quiquiz_code }}" style="display: none;"> -->
     <button type="submit" class="btn btn-primary">Start Quiz</button>
 </form>

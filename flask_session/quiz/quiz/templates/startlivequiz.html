@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Waiting Room</h1>
+<h2>{{ quiztitle }}</h2>
+
+<p>Let participants join {{ quiz_code }}</p>
+
+<ul>
+    {% for student in students_in_quiz %}
+    <li>{{ student['username'] }}</li>
+    {% endfor %}
+</ul>
+<!-- {% if current_user.id == quiz.creator_id %} -->
+
+<form action="{{ url_for('running_quiz', quiz_code= quiz.quiz_code) }}">
+    <!-- <input type="text" name="quiz_code" value="{{ quiquiz_code }}" style="display: none;"> -->
+    <button type="submit" class="btn btn-primary">Start Quiz</button>
+</form>
+<!-- {% endif %} -->
+
+
+
+{% endblock content %}
