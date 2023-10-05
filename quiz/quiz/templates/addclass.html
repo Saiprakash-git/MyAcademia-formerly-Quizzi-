@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" action="">
+        {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.classname.label(class="form-control-label") }}
+        {% if form.classname.errors %}
+            {{ form.classname(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+                {% for error in form.classname.errors %}
+                    <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.classname(class="form-control form-control-lg") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.submitfield(class="btn btn-outline-info") }}
+    </div>
+</form>
+</div>
+
+{% endblock  %}

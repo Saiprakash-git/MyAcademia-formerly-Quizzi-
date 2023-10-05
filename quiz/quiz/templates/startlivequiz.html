@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<div >
+    <h2>Quiziz</h2> 
+    <fieldset class="participants"> 
+        {% for student in students_in_quiz %}
+    <div class="participant-container">
+        <img class="participant-image" src="{{image_file}}" alt="Participant Image">
+        <div class="participant-name">{{ student['username'] }}</div>
+    </div>
+    
+    {% endfor %}
+    </fieldset>
+        <p id="head"></p>
+        <ul id="participants" style="background-color: aquamarine;"></ul>
+
+</div>
+
+    
+   
+<div class="quiz-room">
+    <h1>{{ quiztitle }}---QuIz</h1>
+    <p>Let participants join <p name="quiz_code">{{ livequiz.quiz_code }}</p></p>
+    <small>refresh to see updated content</small>
+    
+    
+    
+<h4> {{participants}}</h4>
+<a href="{{url_for('exit_quiz')}}" class="btn btn-primary" id="exitquiz">EXIT</a>
+  
+    
+
+{% if livequiz.creator_id == current_user.id %}
+<form method="post" action="{{ url_for('running_quiz', quiz_code= livequiz.quiz_code) }}" >
+    <!-- <input type="text" name="quiz_code" value="{{ quiquiz_code }}" style="display: none;"> -->
+    <button type="submit" class="btn btn-primary">Start Quiz</button>
+</form>
+{% endif %}
+
+</div><script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+
+<script> const socket = io('http://' + document.domain + ':' + location.port); 
+    
+    socket.on('connect', () => {
+        console.log('Connected to the WebSocket server');
+    });
+    
+    socket.on('participant_joined', function(data)  {
+        const head = document.getElementById('head');
+        head.textContent +="participants";
+        console.log("User: " + data.username + " joined");
+        const participantsList = document.getElementById("participants");
+        const participantItem = document.createElement("li");
+        participantItem.textContent = `User: ${data.username}`;
+        participantsList.appendChild(participantItem);
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Disconnected from the WebSocket server');
+    });
+    
+    socket.on('connect_error', (error) => {
+        console.error('WebSocket connection error:', error);
+    });
+    const socket1 = io();
+socket1.on('redirect_to_quiz', function (quizUrl) {
+    
+    window.location.href = quizUrl;
+    console.log('url:::'+quizUrl)
+});
+    
+    
+    </script>
+
+
+{% endblock content %}

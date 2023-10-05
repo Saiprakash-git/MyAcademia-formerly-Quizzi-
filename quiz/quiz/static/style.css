@@ -1,0 +1,425 @@
+
+hr {color: black;
+  height: 1px;
+    background: black;}
+  
+
+ #classinfo{ 
+  border-radius: 8px;
+  max-width: 100%;
+  padding: 20px;
+  background-image: url(blue.jpg);
+  background-size: cover;
+  
+}
+
+
+
+#join_quiz {
+max-width: 50%;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: fixed;
+  top: 50px; /* Adjust the top value to your desired vertical position */
+  right: 60px; /* Adjust the right value to your desired horizontal position */
+ 
+  padding: 10px; /* Add padding for better styling */
+  border: 1px solid #ccc; /* Add a border   for better visibility */
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); /* Add a shadow for a card-like appearance */
+  z-index: 999; /* Ensure it appears above other elements */
+}
+
+#uploadassignment{ 
+  font-size: medium;
+  position: fixed;
+  max-width: 60%;
+  top: 140px;
+  right: 560px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  z-index: 669;
+}
+
+.mini-navbar {
+  background-color: #fff; /* Navbar background color */
+  padding: 10px;
+}
+
+/* Style for the navigation links */
+.class-nav {
+  text-decoration: none;
+  padding: 10px 20px;
+  color: #333; /* Link text color */
+  transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out;
+  position: relative;
+}
+
+.class-nav:hover {
+  text-decoration: none;
+  background-color:#dddddd
+  }
+  
+/* Style for the active link */
+.class-nav.active::after {
+  content: '';
+  display: block;
+  height: 3px; /* Height of the blue line */
+  background-color: #007BFF; /* Color of the line */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 3px;
+}
+
+
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #333; /* Color of the dots */
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+    animation: blink 1.2s infinite;
+  }
+  
+  .dot:last-child {
+    margin-right: 0;
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  .card{ 
+    background-color:#ffffff; /* Change the last value (0.5) to control opacity */
+    border: 2px solid #a19292; 
+    margin-top: 20px;
+    padding: 2px;
+    overflow: hidden;
+  }
+ 
+  .custom-row {
+    /* Your custom row styles here */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.custom-col {
+    /* Your custom column styles here */
+    flex: 1;
+    margin: 10px;
+    /* Adjust width and margin as needed */
+}
+
+ 
+  .classdd {
+ 
+    position: fixed;
+    /* Ensure it appears above other elements */
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Style for the three-dot button */
+.dot-button {
+    background-color: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Style for the dropdown content */
+.classdd-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown content links */
+.classdd-content a {
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    color: #333;
+}
+
+.bg-steel {
+    background-color: #5f788a;
+    background-color: black;
+  }
+  
+.site-header .navbar-nav .nav-link {
+    color: black
+   
+  }
+  
+  .site-header .navbar-nav .nav-link:hover {
+    color:#444444
+    
+  }
+  
+  .site-header .navbar-nav .nav-link.active {
+    font-weight: 500;
+  }
+  .navbar{ 
+    background-color: #333333;
+  }
+  
+  .content-section {
+    background: #ffffff;
+    padding: 10px 20px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    margin-bottom: 20px;
+  }
+  
+  .article-title {
+    color: #444444;
+  }
+  
+  a.article-title:hover {
+    color: #428bca;
+    text-decoration: none;
+  }
+  
+  .article-content {
+    white-space: pre-line;
+  }
+  
+  .article-img {
+    height: 65px;
+    width: 65px;
+    margin-right: 16px;
+  }
+  
+  .article-metadata {
+    padding-bottom: 1px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid #e3e3e3
+  }
+  
+  .article-metadata a:hover {
+    color: #333;
+    text-decoration: none;
+  }
+  
+  .article-svg {
+    width: 25px;
+    height: 25px;
+    vertical-align: middle;
+  }
+  
+  .account-img {
+    height: 125px;
+    width: 125px;
+    margin-right: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .account-heading {
+    font-size: 2.5rem;
+  }
+
+  #navbar { 
+    background-color: #333333;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #130d0d;
+    line-height: 1.25;
+    font-size: 28px;
+    font-weight: bold;
+    margin: 0;
+}
+p{ 
+  color: #070505;
+}
+  
+label{ 
+  color: #dddddd;
+}
+
+
+ /* Add some basic styling to the card container */
+ .quiz-container {
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+  padding-right: 20px; /* Add some spacing from the right edge */
+}
+
+/* Add some basic styling to the card */
+.quizzescard {
+  background-color: #f7f7f7;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  width: 300px; /* Adjust the width as needed */
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  z-index: 2;
+}
+
+/* Styles for the centered card */
+.centered-card {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 20px;
+  background-color: white; /* Card background color */
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+
+.quiz-modal-content{ 
+  max-width: 90%;
+  padding: 20px;
+}
+#startNowButton{ 
+  color: white;
+}
+#startLaterButton{ 
+  color: #ffffff;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+
+  padding: 0;
+  margin-top: 20px;
+}
+
+.participants{
+  margin-left: 20px; 
+  max-width: 30%;
+}
+.quiz-room {
+  text-align: center;
+  margin: 20px auto;
+  left: 10px;
+
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+.participant-container {
+  margin-bottom: 2px;
+  display: flex; /* Display as a flex container */
+  align-items: center; /* Center content vertically */
+  padding: 8px; /* Add padding for spacing */
+  background-color: #ca8fea; /* Background color for the container */
+  border: 2px solid #ccc; /* Border for the container */
+  border-radius: 20px; /* Rounded corners for the container */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow for a subtle lift */
+}
+
+/* Style for the participant image */
+.participant-image {
+  width: 40px; /* Set the width of the image */
+  height: 40px; /* Set the height of the image */
+  border-radius: 50%; /* Make the image round */
+  margin-right: 15px; /* Add margin for spacing between image and name */
+  border: 2px solid #fff; /* Add a border to the image */
+}
+
+/* Style for the participant name */
+.participant-name {
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add ellipsis (...) for overflow text */
+  font-size: 16px; /* Font size for the name */
+  font-weight: bold; /* Bold font for the name */
+  color: #333; /* Text color for the name */
+}
+
+.hidden {
+  display: none;
+}
+#exitquiz{ 
+  margin-left: 80%;
+}
+
+.card-quiz {
+  width: 190px;
+  height: 254px;
+  background: #eef3f8;
+  position: relative;
+  display: flex;
+  place-content: center;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  
+}
+
+.card-quiz h2 {
+  z-index: 1;
+  color: white;
+  font-size: 2em;
+}
+
+.card-quiz::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+  height: 130%;
+  animation: rotBGimg 3s linear infinite;
+  transition: all 0.2s linear;
+}
+
+@keyframes rotBGimg {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.card-quiz::after {
+  content: '';
+  position: absolute;
+  background: #e3e7ec;
+  ;
+  inset: 5px;
+  border-radius: 15px;
+}  
+
+#create{ 
+  margin-top: 10px;
+  margin-bottom: 10px;
+  
+}

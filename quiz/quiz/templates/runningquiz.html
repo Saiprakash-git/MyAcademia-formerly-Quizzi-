@@ -1,0 +1,56 @@
+
+
+{% extends "layout.html" %}
+{% block content %}
+  <h1>Quiz: {{ quiztitle }}</h1>
+  <form method="POST" id="quiz-form">
+    {% for question in questions %}
+      <div class="question">
+        <p>{{ question.text }}</p>
+        <ul>
+          {% for option in question.options %}
+            <li>
+              <input type="radio" name="question_{{ question.id }}" value="{{ option.id }}">
+              {{ option.option_text }}
+            </li>
+          {% endfor %}
+        </ul>
+        <p>Time Left: <span id="timer_{{ question.id }}">{{ question.timer }}</span> seconds</p>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <script>
+
+   
+
+
+    // JavaScript code for timer countdown
+    var timers = document.querySelectorAll('[id^="timer_"]');
+    var submitButton = document.querySelector('button[type="submit"]');
+    var countdown = setInterval(function () {
+      timers.forEach(function (timer) {
+        var seconds = parseInt(timer.textContent);
+        if (seconds > 0) {
+          timer.textContent = seconds - 1;
+        } else {
+          // Time's up for this question, disable its options
+          var questionId = timer.id.replace('timer_', '');
+          var questionOptions = document.querySelectorAll('input[name="question_' + questionId + '"]');
+          questionOptions.forEach(function (option) {
+            option.disabled = true;
+          });
+        }
+      });
+      // Check if all timers are done
+      var allTimersDone = Array.from(timers).every(function (timer) {
+        return parseInt(timer.textContent) === 0;
+      });
+      if (allTimersDone) {
+        clearInterval(countdown);
+        submitButton.click(); // Automatically submit the quiz when all timers are done
+      }
+    }, 1000);
+  </script>
+{% endblock content %}

@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Live Quiz</h2> 
+
+    <form method="POST" id="quiz-form" action="{{url_for('add_livequiz')}}" >
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="title">Title:</label>
+            {{ form.title(class="form-control", placeholder="Enter quiz title") }}
+        </div>
+       
+        <div class="form-group">
+            <label for="timer">Question Timer (seconds):</label>
+            {{ form.timer(class="form-control", placeholder="Enter timer") }}
+        </div>
+        <div class="form-group">
+            <label for="num_questions">Number of Questions:</label>
+            <input type="number" class="form-control" id="num_questions" name="num_questions" min="1">
+        </div>
+        <div id="questions-container">
+            <!-- This is where the dynamically generated question inputs will be inserted -->
+        </div>
+        <!-- Button to show the modal -->
+        
+       
+          </div>
+          <button type="submit" class="btn btn-primary" id="showStartCardButton">Add Live Quiz</button>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const questionsContainer = document.getElementById("questions-container");
+        document.getElementById("num_questions").addEventListener("change", function() {
+            const numQuestions = parseInt(this.value);
+            questionsContainer.innerHTML = "";
+
+            for (let i = 1; i <= numQuestions; i++) {
+                const questionDiv = document.createElement("div");
+                questionDiv.className = "question";
+
+                const questionInput = document.createElement("input");
+                questionInput.type = "text";
+                questionInput.name = "question_" + i;
+                questionInput.placeholder = "Enter Question " + i;
+                questionInput.className = "form-control mb-2";
+                questionDiv.appendChild(questionInput);
+
+                const optionInputContainer = document.createElement("div");
+
+                for (let j = 1; j <= 4; j++) {
+                    const optionInput = document.createElement("input");
+                    optionInput.type = "text";
+                    optionInput.name = "question_" + i + "_option_" + j;
+
+                    if (j === 4) {
+                        optionInput.name = "question_" + i + "_option_4"; // Keep the same naming convention
+                        optionInput.placeholder = "Option " + j + " (Enter the correct option)"; // Add "(Enter the correct option)" to the placeholder
+                    } else {
+                        optionInput.placeholder = "Option " + j;
+                    }
+                    optionInput.className = "form-control mb-2";
+                    optionInputContainer.appendChild(optionInput);
+                }
+
+                questionDiv.appendChild(optionInputContainer);
+                questionsContainer.appendChild(questionDiv);
+            }
+        });
+       
+    });
+</script>
+</div>
+
+{% endblock content %}
