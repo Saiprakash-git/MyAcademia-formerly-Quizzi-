@@ -17,10 +17,6 @@ function toggleDropdown() {
       dropdown.style.display = "block";
   }
 }
-// const socket1 = io();
-// socket1.on('redirect_to_quiz', function (quizUrl) {
-//     window.location.href = quizUrl;
-// });
 
    
 

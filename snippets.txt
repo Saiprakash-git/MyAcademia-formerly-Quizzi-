@@ -1,0 +1,88 @@
+@app.route('/add_assignment', methods=['GET', 'POST'])
+@login_required
+def add_assignment():
+    current_classid = session.get('current_classid')
+    user_classes = Class.query.filter_by(creator_id=current_user.id).all()
+    for uc in user_classes:
+        if current_classid == uc.id: 
+            user_classes.remove(uc)
+    form = AddAssignment() 
+    form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
+    print(form.class_id.choices)
+    if form.validate_on_submit():
+        selected_class_ids = request.form.getlist('class_ids[]')
+        selected_class_ids.add(current_classid)
+        for class_id in selected_class_ids:
+            title = form.assignmenttitle.data
+            description = form.assignmentdescription.data
+            due_date = form.duedate.data
+            class_id = class_id
+            points = form.points
+            attachment = form.attachment.data  # Get the uploaded file
+
+            if attachment:  
+                filename = secure_filename(attachment.filename)
+                attachment_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                attachment.save(attachment_path)  # Save the file
+
+            assignment = Assignment(title=title, description=description, due_date=due_date,points=points,
+                                    class_id=class_id, creator_id=current_user.id,
+                                    file_attachment=attachment_path)
+            db.session.add(assignment)
+            db.session.commit()
+    
+
+
+        # send_email(assignment)
+        flash('Assignment created successfully!', 'success')
+        return redirect(url_for('class_info', classid=form.class_id.data))
+
+    return render_template('addassignment.html', form=form, user_classes=user_classes)
+
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Add Assignment</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label >Title:</label>
+            {{ form.assignmenttitle(class="form-control", placeholder="Enter assignment title") }}
+        </div>
+        <div class="form-group">
+            <label >Description:</label>
+            {{ form.assignmentdescription(class="form-control", placeholder="Enter assignment description") }}
+        </div>
+        <div class="form-group">
+            <label>Due Date:</label>
+            {{ form.duedate(class="form-control") }}
+        </div>  
+       
+        <div class="form-group">
+            <label for="points">Points:</label>
+            {{ form.points(class="form-control", placeholder="points for this Assignment") }}
+        </div>
+        <div class="form-group">
+            {{ form.attachment.label() }}
+            {{ form.attachment(class="form-control-file") }}
+            {% if form.attachment.errors %}
+                {% for error in form.attachment.errors %}
+                    <span class="text-danger">{{ error }}</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label>Want to add this assignment to your other classes</label>
+            {% for class_ in user_classes %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="class_{{ class_.id }}" name="class_ids[]" value="{{ class_.id }}">
+                    <label class="form-check-label"  >{{ class_.class_name }}</label>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{{ form.submit }}</button>
+    </form>
+</div>
+{% endblock %}

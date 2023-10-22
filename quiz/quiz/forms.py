@@ -62,10 +62,11 @@ class AddAssignment(FlaskForm):
     assignmentdescription = TextAreaField('assignmentdescription',validators=[DataRequired()])
     duedate = DateField('due_date', format='%Y-%m-%d', validators=[DataRequired()])
     attachment = FileField('Attachment')
-    class_id = SelectField('Class', coerce=int)      
+     
+    points = IntegerField('points',validators=[DataRequired()])   
     submit = SubmitField('Add Assignment')
 
-class UpdateAccount(FlaskForm): 
+class UpdateAccount(FlaskForm):   
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',

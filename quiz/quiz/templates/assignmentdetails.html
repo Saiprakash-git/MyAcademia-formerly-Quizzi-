@@ -7,8 +7,11 @@
   background-color: #007bff;
   color: #fff;
   padding: 10px 20px;
-  border: none;
+  margin-left: 30px;
   cursor: pointer;
+}
+#turnInButton{ 
+  margin-left: 20px;
 }
 
 /* Style for the file input */
@@ -20,15 +23,87 @@
 #selectedFile {
   margin-top: 10px;
   font-weight: bold;
-}</style>
+}
+/* Style for the container */
+.assignment-header {
+    display: flex; /* Use flexbox for layout */
+   
+    justify-content: space-between; /* Create space between text and button */
+    
+}
+
+/* Style for the button */
+#deletebtn {
+    margin-left: 10px; /* Add some spacing between the text and the button */
+}
+
+.assignment-container{ 
+  
+  display: flex;
+}
+
+.uploadwork {   
+    margin-left: 450px;
+    align-items: center;
+   
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 5px;
+    
+}
+.responses {   
+    margin-left: 400px;
+   
+  
+   
+    padding: 10px;
+    border-radius: 5px;
+    
+}
+sub{ 
+  font-size: 13px;
+}
+</style>
 <div class="container mt-4">
-    <h2>{{ assignment.title}}<small style="font-size: 50%;">     {{assignment.created_at}}</small> </h2>
+  <div class="assignment-header">
+    <h2>{{ assignment.title }}<small style="font-size: 50%;">Assigned on - {{ assignment.created_at }}</small></h2>
+    <!-- {% if current_user.id == assignment.creator_id %}
+    <a class="btn btn-primary" id="deletebtn" href="{{ url_for('delete_assignment', assignment_id=assignment.id) }}">Delete Assignment</a>
+    {% endif %} -->
+</div>
+<div >
     <hr style="color: black;
     background: black;">
     <h3></h3>
-    <p>{{ assignment.description }}</p> 
-    <p>Due Date: {{ assignment.due_date }}</p>
+    <div class="assignment-container">
+      
+      <br>
+      <p>{{ assignment.description }}</p> 
     
+    {% if current_user.id != assignment.creator_id %}
+    <form action="{{url_for('upload_assignment',assignment_id=assignment.id)}}" method="POST" enctype="multipart/form-data">
+      <div class="uploadwork">
+        <p>Upload your Work</p>
+        <input type="file" id="fileInput" name="fileInput">
+        <button class="plus" type="button" onclick="openFileInput()">+</button>
+        <p id="selectedFile"></p>
+        <button  type="submit" id="turnInButton" class="btn btn-secondary " disabled>Turn In</button>
+      </div>
+    </form>
+    {% else %}
+    <div class="responses"> 
+      <p style="font-size: large;">Responses</p>
+      <h6> {{turned_in}} <sub>Turned in</sub>|{{participants}} <sub>Assigned</sub>
+        <br> 
+      </h6>
+
+
+    </div>
+    {% endif %}
+  </div>
+    
+    <p>Due Date: {{ assignment.due_date }}</p>
+    <big>{{assignment.points}} points</big>
     {% if filename %}
 
 
@@ -36,33 +111,64 @@
     <br>
     
     <p><a href="{{ url_for('download_attachment', filename=assignment.file_attachment) }}"><img src="{{url_for('static', filename='profiles/' + 'document-img.jpg')}}" >{{ filename}}</a></p>
-      {% if current_user.id == assignment.creator_id %}
-      <a class="btn btn-primary"  href="{{ url_for('delete_assignment',assignment_id=assignment.id) }}"> Delete Assignment</a>
-     
-      {% else %}
-      <div id="uploadassignment">
-       <p>Upload your Work</p>
-        <input type="file" id="fileInput">
-        <button class="plus" onclick="openFileInput()">+</button>
-        <p id="selectedFile"></p>
-    
-         
+    {% if current_user.id == assignment.creator_id %}
+   
+      
+      {% for submitted in submitted_assignment %}
+      <div class="submissions">
+          <p>{{ submitted.student_username }}</p>
+          {% if submitted.points_scored is none %}
+          <form action="{{ url_for('assignment_score', assignment_id=submitted.assignment_id) }}" method="post">
+              Points:
+              <input type="number" name="score" placeholder="Enter points">
+              <button type="submit">Submit</button>
+          </form>
+          {% else %}
+          <p>Points: {{ submitted.points_scored }}</p>
+          {% endif %}
+          <p><a href="{{ url_for('download_upload', filename=submitted.uploaded_assignment) }}"><img src="{{ url_for('static', filename='profiles/' + 'uploaded_attachment.jpg') }}" > Response</a></p>
+          <br>
       </div>
+      {% endfor %}
+      
+  
+      {% else %}
+      
+      </div>
+      
+         {% for submitted in submitted_assignment %}
+         <div class="submissions">
+      <p> {{submitted.student_username}}</p>
+      {% if submitted.points_scored != none %}
+      <p>Points scored: {{ submitted.points_scored }}</p>
+          {% endif %}
+      <p><a href="{{ url_for('download_upload',filename=submitted.uploaded_assignment) }}"><img src="{{url_for('static', filename='profiles/' + 'uploaded_attachment.jpg')}}"> Response</a></p>
+    </div>
+      {% endfor %}
+    
       {% endif %}
     {% endif %} 
-
-</div>
+  
+  </div>
 <script>
   function openFileInput() {
-      document.getElementById("fileInput").click();
+    document.getElementById("fileInput").click();
   }
 
-  document.getElementById("fileInput").addEventListener("change", function() {
-      const selectedFile = document.getElementById("fileInput").files[0];
-      if (selectedFile) {
-          document.getElementById("selectedFile").textContent = "Selected file: " + selectedFile.name;
-          // You can do further processing with the selected file here
-      }
+  // Function to handle file selection
+  document.getElementById("fileInput").addEventListener("change", function () {
+    const selectedFile = document.getElementById("fileInput").files[0];
+    const turnInButton = document.getElementById("turnInButton");
+
+    if (selectedFile) {
+      // If a file is selected, enable the "Turn In" button
+      turnInButton.removeAttribute("disabled");
+      document.getElementById("selectedFile").textContent = selectedFile.name;
+    } else {
+      // If no file is selected, disable the "Turn In" button
+      turnInButton.setAttribute("disabled", "true");
+      document.getElementById("selectedFile").textContent = "";
+    }
   });
 </script>
 {% endblock %}

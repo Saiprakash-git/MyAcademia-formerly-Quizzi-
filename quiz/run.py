@@ -1,8 +1,8 @@
-from quiz import app, socketio
+from quiz import app
+
 
 
 
 if __name__ == '__main__':
    app.run(debug=True)
 
-socketio.run(app)

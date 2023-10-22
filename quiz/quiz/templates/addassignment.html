@@ -15,15 +15,13 @@
         <div class="form-group">
             <label for="due_date">Due Date:</label>
             {{ form.duedate(class="form-control") }}
+            <input type="time" name="due_time" placeholder="due time" class="form-control">
         </div>  
         <div class="form-group">
-            <label for="class_id">Select Class:</label>
-            <select class="form-control" id="class_id" name="class_id">
-                {% for class_ in user_classes %}
-                    <option value="{{ class_.id }}">{{ class_.class_name }}</option>
-                {% endfor %}
-            </select>
+            <label for="points">Points:</label>
+            {{ form.points(class="form-control", placeholder="points for this Assignment") }}
         </div>
+        
         <div class="form-group">
             {{ form.attachment.label() }}
             {{ form.attachment(class="form-control-file") }}

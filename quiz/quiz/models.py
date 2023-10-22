@@ -21,10 +21,7 @@ class User(db.Model, UserMixin):
     quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts', lazy='dynamic', cascade="all, delete-orphan")
     assignments = db.relationship('Assignment', backref='user', lazy=True, cascade="all, delete-orphan")
 
-    # classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic')
-    # quizzes = db.relationship('LiveQuiz', backref='user', lazy=True)
-    # quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts',lazy='dynamic')
-    # assignments = db.relationship('Assignment', backref='user', lazy=True)
+    
 
 class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,8 +33,6 @@ class Class(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     assignments = db.relationship('Assignment', backref='class', lazy=True, cascade="all, delete-orphan")
     quizzes = db.relationship('Quiz', backref='class', lazy=True, cascade="all, delete-orphan")
-    # assignments = db.relationship('Assignment', backref='class', lazy=True)
-    # quizzes = db.relationship('Quiz', backref='class', lazy=True)
 
     def _repr_(self):
         return f"Class('id: {self.id}')"
@@ -48,9 +43,21 @@ class Assignment(db.Model):
     description = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     due_date = db.Column(db.DateTime, nullable=False)
+    points = db.Column(db.Integer, nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     file_attachment = db.Column(db.String(255), nullable=True)
+    assignment_scores = db.relationship('Assignment_Score', cascade='all, delete-orphan')
+    
+class Assignment_Score(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    assignment_id = db.Column(db.Integer, db.ForeignKey('assignment.id') , nullable=False)
+    student_username = db.Column(db.Integer, db.ForeignKey('user.username'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
+    uploaded_assignment  = db.Column(db.String(255), nullable=True)
+    points = db.Column(db.Integer, nullable=False)
+    points_scored = db.Column(db.Integer)
+   
 
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)

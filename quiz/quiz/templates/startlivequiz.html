@@ -40,40 +40,8 @@
 {% endif %}
 
 </div><script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-<!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
 
-<script> const socket = io('http://' + document.domain + ':' + location.port); 
-    
-    socket.on('connect', () => {
-        console.log('Connected to the WebSocket server');
-    });
-    
-    socket.on('participant_joined', function(data)  {
-        const head = document.getElementById('head');
-        head.textContent +="participants";
-        console.log("User: " + data.username + " joined");
-        const participantsList = document.getElementById("participants");
-        const participantItem = document.createElement("li");
-        participantItem.textContent = `User: ${data.username}`;
-        participantsList.appendChild(participantItem);
-    });
-    
-    socket.on('disconnect', () => {
-        console.log('Disconnected from the WebSocket server');
-    });
-    
-    socket.on('connect_error', (error) => {
-        console.error('WebSocket connection error:', error);
-    });
-    const socket1 = io();
-socket1.on('redirect_to_quiz', function (quizUrl) {
-    
-    window.location.href = quizUrl;
-    console.log('url:::'+quizUrl)
-});
-    
-    
-    </script>
+  
 
 
 {% endblock content %}

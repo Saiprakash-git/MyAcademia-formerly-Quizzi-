@@ -105,7 +105,7 @@
             <li class="nav-item"><a class="nav-link "tabindex="-1" aria-disabled="true">{{ current_user.username}}</a></li>
             
             <li ><!-- Add this button to your HTML where you want the + symbol -->
-              <div class="btn-group" style=" margin-left: 600px; margin-right: 10px;">
+              <div class="btn-group" style=" margin-left: 710px; margin-right: 10px;">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     +
                 </button>
@@ -117,13 +117,7 @@
                         <button type="submit" class="dropdown-item" id="create">Join Class</button>
                     </form>
                     
-                      <!-- Modal content goes here -->
-                      <form method="post" action="#">
-                        <input type="hidden" name="class_id" value="None">
-                        
-                          <button type="button" class="dropdown-item" onclick="openQuizModal()">Create Quiz</button>
                      
-                        </form>
   
                      
                 </div>
@@ -151,21 +145,7 @@
           </ul>
         
       </nav>
-      <div class="centered-card" id="quizModal"> 
-        <div class="card-body">
-        <div class="card-text">  
-          You can create a Quiz for a class, Go through the class to conduct quiz for a class
-          <br>
-          <a href="{{url_for('home')}}" class="btn btn-">Back</a>
-          
-            <input type="hidden" name="class_id" value="None">
-            
-            <a  href="{{url_for('add_livequiz')}}" class="btn btn-outline-success" onclick="openQuizModal()">Continue</a>
-         
-          </div>
-          
-        </div>
-      </div>
+      
     
       <main role="main" id="layout" class="container">
         <div class="row">
@@ -179,7 +159,11 @@
                 {% endfor %}
               {% endif %}
             {% endwith %}
-  {% block content %}{% endblock %}
+            {% block content %}{% endblock %}
+            </div>
+            </div>
+            </main>
+  
 
    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

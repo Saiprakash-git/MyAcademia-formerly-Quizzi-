@@ -1,30 +1,28 @@
-from quiz import app,db,socketio 
+from quiz import app,db
 from quiz.models import Class,Quiz,Option, Question, LiveQuiz, QuizLog, User, QuizAttempts
 from quiz.forms import AddQuizForm, AddLiveQuizForm
 from flask_login import  current_user, login_required
 from quiz.utils import quizcode_generator , live_quizcode_generator
 from flask import render_template, redirect, url_for, request, flash, session
-
 from random import shuffle
 from datetime import datetime, timedelta
-
 
 student_details = []
 participant_list = []
 current_running = []
 
+@app.route('/livequiz/<int:class_id>', methods=['POST','GET'])
+def add_livequiz(class_id): 
 
-
-@app.route('/livequiz', methods=['POST','GET'])
-def add_livequiz(): 
-    class_id = request.form.get('class_id')
     form = AddLiveQuizForm()
     quiz_code = live_quizcode_generator()
+    print("=======",class_id)
     user_classes = Class.query.filter_by(creator_id=current_user.id).all()
     if request.method == 'POST' and form.validate_on_submit():
         num_questions = form.num_questions.data  
         
         if class_id:
+            
             quiz = Quiz(
                 quiz_code=quiz_code,
                 class_id= class_id,
@@ -68,7 +66,7 @@ def add_livequiz():
         session['quiz_id'] = quiz.id
         
         return render_template('startorlater.html',quiz_id=quiz.id)
-    return render_template('addLivequiz.html', form=form,user_classes=user_classes )
+    return render_template('addLivequiz.html', form=form,user_classes=user_classes, class_id=class_id )
 
 @app.route('/start_live_quiz/<int:quiz_id>', methods=['GET','POST'])
 def start_live_quiz(quiz_id):
@@ -90,7 +88,7 @@ def join_quiz(quiz_code):
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
     print(quiz)
     if quiz:
-        socketio.emit('quiz_joined', {'username': username})
+
         session['current_quiz'] = {
             'quiz_id':quiz.id,
             'quiz_code':quiz.quiz_code, 
@@ -100,31 +98,6 @@ def join_quiz(quiz_code):
     student_details.append({'quiz_id': quiz.id, 'username':username})
     return redirect(url_for('start_live_quiz',quiz_id=quiz.id))
 
-@socketio.on('quiz_joined')
-def quiz_joined(username):
-    socketio.emit('participant_joined',username, broadcast=True)
-    print('joiniinggg processs')
-# @app.route('/JoinQuiz', methods=['POST', 'GET'])
-# def join_quiz():
-#     username = request.form.get('username')
-#     quiz_code = request.form.get('quiz_code')
-#     print("==============",quiz_code,"username",username)
-  
-#     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
-#     print(quiz)
-#     if quiz :
-#         socketio.emit('participant_joined', {'username': username})
-#         print('emmittinggg')
-        
-#         # participant_list.append({'quiz_id': quiz.id, 'username':username})
-#         attempts = QuizAttempts(quiz_id=quiz.id,student_id=session['current_user']['id'],quiz_code=quiz_code)
-#         db.session.add(attempts)
-#         db.session.commit() 
-        
-#         return redirect(url_for('start_live_quiz',quiz_id=quiz.id))
-#     else: 
-#         flash("No Quiz Found","info")
-#         return redirect(url_for('home'))
 
 @app.route('/exit_quiz')
 def exit_quiz(): 
@@ -132,17 +105,11 @@ def exit_quiz():
     
     return redirect(url_for('home'))
 
-@app.route('/quiz/start-<int:quiz_id>')
-def start_quiz(quiz_id):
-    quiz = Quiz.query.get_or_404(quiz_id)
-    questions = Quiz.questions
-    print(questions)
 
 @app.route('/running_quiz/<int:quiz_code>', methods=['GET','POST'])
 def running_quiz(quiz_code):
-    # socketio.emit('quiz_started',{quiz_code:'quiz_code'})
-    url = "http://127.0.0.1:5000/running_quiz/" + str(quiz_code)
-    socketio.emit('redirect_to_quiz',url)
+
+
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
     if quiz is None:
         return "Invalid quiz code"
@@ -195,75 +162,16 @@ def running_quiz(quiz_code):
         return render_template("quizresult.html",result=result)
 
 
-# @socketio.on('quiz_started')
-# def start_quiz(data):
-#     quiz_url = data['quizUrl']
- 
-#     socketio.emit('redirect_to_quiz', quiz_url, room=request.sid)
-
 
 
 # @app.route('/quiz_result/<int:quiz_id>/<int:score>')
 # def quiz_result(quiz_id, score):
 #     quiz = Quiz.query.get_or_404(quiz_id)
 #     return render_template('quizresult.html', quiz=quiz, score=score)
-
 @app.route('/quiz/<int:quiz_id>/results')
 def quiz_result(quiz_id): 
     return ''
 
-
-
-
-@app.route('/classinfo/Add_Quiz', methods=['GET', 'POST'])
-@login_required
-def add_quiz():
-    user_classes = Class.query.filter_by(creator_id=current_user.id).all()
-
-    form = AddQuizForm()
-    form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
-    quiz_code = quizcode_generator()
-    if request.method == 'POST' and form.validate_on_submit():
-        num_questions = form.num_questions.data  # Get the number of questions from the form
-
-        quiz = Quiz(
-            class_id=form.class_id.data,
-            quiz_code=quiz_code,
-            title=form.title.data,
-            timer=form.timer.data
-        )
-        db.session.add(quiz)
-        db.session.commit()
-
-        for i in range(num_questions):
-            question_text = request.form.get(f'question_{i + 1}')  
-            if question_text:
-                question = Question(quiz_id=quiz.id, text=question_text)
-                db.session.add(question)
-                db.session.commit()
-
-                options = []
-                for j in range(1, 5):
-                    option_text = request.form.get(f'question_{i + 1}_option_{j}')
-                    if option_text:
-                        options.append(option_text)
-
-                if len(options) == 4:
-                    option = Option(
-                        question_id=question.id,
-                        quiz_id=quiz.id,
-                        option1=options[0],
-                        option2=options[1],
-                        option3=options[2],
-                        option4=options[3]
-                    )
-                    db.session.add(option)
-                    db.session.commit()
-
-        flash('Quiz has been added', 'success')
-        return redirect(url_for('class_info', classid=form.class_id.data))
-
-    return render_template('addquiz.html', form=form, user_classes=user_classes)
 
 @app.route('/quiz/<int:quiz_id>')
 def quiz_details(quiz_id):
@@ -296,7 +204,5 @@ def submit_quiz(quiz_id):
         selected_option = Option.query.get(selected_option_id)
         if selected_option.is_correct:
             score += 1
-
-    # Save the score in the database or take any other necessary actions
 
     return redirect(url_for('quiz_result', quiz_id=quiz.id, score=score))
