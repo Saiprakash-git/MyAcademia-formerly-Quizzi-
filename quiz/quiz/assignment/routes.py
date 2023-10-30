@@ -1,36 +1,25 @@
-import os
-
-# from aiohttp import request 
+import os 
 from quiz import app, db
 from flask_login import  current_user,  login_required
 from quiz.forms import AddAssignment 
-from quiz.models import User, Class,Assignment ,Assignment_Score
+from quiz.models import User, Class,Assignment 
 from werkzeug.utils import secure_filename
-from flask import render_template, redirect, session, url_for,  flash, current_app, send_from_directory, send_file, request
-from quiz.utils import assignment_added_email 
-from datetime import datetime
-
+from flask import render_template, redirect, url_for,  flash, current_app, send_from_directory, send_file
+from quiz.utils import assignment_added_email
 
 
 @app.route('/add_assignment', methods=['GET', 'POST'])
 @login_required
 def add_assignment():
-    current_classid = session.get('current_classid')
     user_classes = Class.query.filter_by(creator_id=current_user.id).all()
     form = AddAssignment()
-    
+    form.class_id.choices = [(class_.id, class_.class_name) for class_ in user_classes]
+
     if form.validate_on_submit():
         title = form.assignmenttitle.data
         description = form.assignmentdescription.data
         due_date = form.duedate.data
-        due_time = request.form.get('due_time')
-        due_datetime_str = f"{due_date} {due_time}"
-
-# You can parse this combined string into a datetime if needed
-        due_date = datetime.strptime(due_datetime_str, '%Y-%m-%d %H:%M')
-
-        points = form.points.data
-        class_id = current_classid
+        class_id = form.class_id.data
         attachment = form.attachment.data  # Get the uploaded file
 
         if attachment:  # Check if a file was uploaded
@@ -38,14 +27,14 @@ def add_assignment():
             attachment_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             attachment.save(attachment_path)  # Save the file
 
-        assignment = Assignment(title=title, description=description, due_date=due_date,points=points,
+        assignment = Assignment(title=title, description=description, due_date=due_date,
                                 class_id=class_id, creator_id=current_user.id,
                                 file_attachment=attachment_path)
         db.session.add(assignment)
         db.session.commit()
-        #send_email(assignment)
+        # send_email(assignment)
         flash('Assignment created successfully!', 'success')
-        return redirect(url_for('class_info', classid=current_classid))
+        return redirect(url_for('class_info', classid=form.class_id.data))
 
     return render_template('addassignment.html', form=form, user_classes=user_classes)
 
@@ -71,48 +60,9 @@ def download_attachment(filename):
 @app.route('/assignment/<int:assignment_id>')
 def assignment_details(assignment_id):
     assignment = Assignment.query.get_or_404(assignment_id)
-    submitted_assignments = Assignment_Score.query.filter_by(assignment_id=assignment_id).all()
-    turned_in = len(submitted_assignments)
-    participants = session.get('participants')
-    print("partiivioa",participants)
     if assignment.file_attachment:
         filename = os.path.basename(assignment.file_attachment)
-    
-    return render_template('assignmentdetails.html', assignment=assignment, current_user=current_user, 
-    filename=filename, submitted_assignment=submitted_assignments, turned_in=turned_in, participants=participants)
-
-@app.route('/uploadassignment-<int:assignment_id>', methods=['GET', 'POST'])
-def upload_assignment(assignment_id):
-    if request.method == 'POST':
-        uploaded_file = request.files['fileInput']
-        
-        if uploaded_file:
-            filename = secure_filename(uploaded_file.filename)
-            attachment_path = os.path.join(current_app.config['SUBMIT_FOLDER'], filename)
-            uploaded_file.save(attachment_path)
-            a_assignment = Assignment.query.get_or_404(assignment_id)
-            assignment = Assignment_Score(assignment_id=assignment_id,student_username=current_user.username,class_id=session.get('current_classid'),
-                                          uploaded_assignment=attachment_path ,points=a_assignment.points)
-            db.session.add(assignment)
-            db.session.commit()
-            print('uploaded successfullyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
-    return redirect(url_for('assignment_details', assignment_id=assignment_id))
-
-@app.route('/download_upload/<filename>', methods=['GET'])
-def download_upload(filename):
-    file_path = os.path.join(app.config['SUBMIT_FOLDER'], filename)
-    
-    return send_file(file_path, as_attachment=True)
- 
-@app.route('/assignment_score/<int:assignment_id>', methods=['GET', 'POST'])
-def assignment_score(assignment_id):
-    assignment = Assignment_Score.query.get_or_404(assignment_id)
-    if assignment and request.method == 'POST':
-        points = request.form.get('score')
-        assignment.points_scored = points
-        
-        db.session.commit()
-    return redirect(url_for('assignment_details', assignment_id=assignment_id))
+    return render_template('assignmentdetails.html', assignment=assignment, current_user=current_user, filename=filename)
 
 @app.route('/<int:assignment_id>/delete')
 def delete_assignment(assignment_id): 

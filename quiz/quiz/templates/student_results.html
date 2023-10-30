@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Quiz Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        ul {
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        #chart-container {
+            width: 50%;
+            margin: 10px auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Quiz Results</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Quiz Title</th>
+                <th>Your Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz_title, score in student_quiz_results.items() %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ quiz_title }}</td>
+                <td>{{ score }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add a chart container -->
+    <div id="chart-container">
+        <canvas id="quiz-results-chart"></canvas>
+    </div>
+    <script>
+        // Extract data from the table and prepare it for the chart
+        var quizTitles = [];
+        var scores = [];
+        var colors = [];
+
+        {% for quiz_title, score in student_quiz_results.items() %}
+            quizTitles.push("{{ quiz_title }}");
+            scores.push({{ score }});
+            // Generate random RGB color
+            var randomColor = 'rgba(' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ',' + Math.floor(Math.random() * 256) + ', 0.6)';
+            colors.push(randomColor);
+        {% endfor %}
+
+        // Get the canvas element
+        var ctx = document.getElementById('quiz-results-chart').getContext('2d');
+
+        // Calculate the bar width based on the number of bars
+        var barWidth = 30; // Adjust this value as needed
+
+        // Create the bar chart with colorful bars and numeric x-axis values
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: quizTitles,  // Quiz titles
+                datasets: [{
+                    label: 'Your Score',
+                    data: scores,  // Scores for each quiz
+                    backgroundColor: colors,  // Use the generated colors
+                    borderColor: colors,  // Border color
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        suggestedMin: 0,  // Set the minimum value for the x-axis
+                        suggestedMax: 100,  // Set the maximum value for the x-axis
+                    }
+                },
+                layout: {
+                    padding: {
+                        left: barWidth / 2, // Adjust the left padding to match the bar width
+                    }
+                },
+                indexAxis: 'x',  // Use the x-axis for category labels
+                barThickness: barWidth, // Set the custom bar width
+                barPercentage: 1.0, // Reduce the gap between bars
+                categoryPercentage: 0.6, // Reduce the gap between categories
+            }
+        });
+    </script>
+</body>
+</html>

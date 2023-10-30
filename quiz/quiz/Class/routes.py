@@ -3,8 +3,7 @@ from quiz.models import Class, Assignment, User, ClassStudent
 from quiz.forms import AddAssignment, AddClass, JoinClass
 from quiz.utils import classcode_generator, get_people
 from flask_login import  current_user, logout_user, login_required
-from flask import  render_template, redirect, session, url_for, request, flash,  request
-
+from flask import  render_template, redirect, url_for, request, flash,  request
 
 
 @app.route("/addclass", methods=['GET','POST'])
@@ -25,8 +24,6 @@ def add_class():
 @app.route('/_class/<int:classid>')
 def class_info(classid):
     classinfo = Class.query.get_or_404(classid)
-    session['current_classid'] = classinfo.id
-    print(session.get('current_classid'))
     user = User.query.filter_by(username=classinfo.username).first()
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
@@ -39,10 +36,8 @@ def class_info(classid):
     #         quizlog[quiz.id] = last_attempt
     
     participants = len(ClassStudent.query.filter_by(class_id=classid).all())
-    session['participants'] = participants
-   
     people = get_people(classid)
-   
+    #users_quizzes = get_users_with_assigned_quiz(classid)
     if classinfo:
         return render_template('classinfo.html',classinfo=classinfo, current_user=current_user,
                                 assignments=assignments,userassigns=userassigns,quizzes=quizzes, participants=participants,  people=people)

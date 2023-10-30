@@ -97,7 +97,7 @@
               </div>
           {% endfor %}
       
-  
+
           {% for classs in joined_classes %}
           <div class="col-md-10">
               <div class="class-card">
@@ -106,8 +106,9 @@
                           <div class="card-title"> 
                               <h4 style="display: inline-block;">
                                   <a href="{{ url_for('class_info', classid=classs.id) }}" style="color: black;">{{ classs.class_name }}</a>
+
                               </h4>
-                              
+
                               <!-- Add the three-dot button here -->
                               <button class="dot-button" onclick="toggleDropdown()"> &#8942;</button>
                           </div>
@@ -164,7 +165,7 @@
         
         <!-- Quizzes can go here if needed -->
        
-        <!-- {% if quizzes %}
+        {% if quizzes %}
         <h3>Quizzes</h3>
         {% for quiz in quizzes %} 
         <div class="card mb-3">
@@ -173,13 +174,21 @@
                 <p class="card-text">{{ quiz.description }}</p>
                 <p class="card-text">Code: {{ quiz.quiz_code }}</p>
                 <a href="{{url_for('start_live_quiz',quiz_id=quiz.id)}}" class="btn btn-primary" target="_blank">Start Now</a>
+                <br>
+                <br>
+                <a href="{{ url_for('combine_results', quiz_id=quiz.id) }}" class="btn btn-primary">Results</a>
+                <br>
+                <br>
+            
+
+
             </div>
         </div>
         {% endfor %}
-        {% endif %} -->
+        {% endif %}
     </div>
 </div>
-
+<!-- Include the Socket.IO client library and your JavaScript script.js -->
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 
