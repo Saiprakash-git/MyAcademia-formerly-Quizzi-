@@ -99,7 +99,6 @@ class LiveQuiz(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=True)
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     datetime = db.Column(db.DateTime, nullable=False)
-
     def __repr__(self):
             return f"LiveQuiz('quiz_id:{self.quiz_id}','quiz_code:{self.quiz_code}')"
     

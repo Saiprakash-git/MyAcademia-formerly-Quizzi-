@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Quizzi</title>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+   <style>
+    body{ 
+      color: #2b3a47;
+    line-height: 1.25;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+}
+    
+    .button {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: rgb(20, 20, 20);
+      border: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+      cursor: pointer;
+      transition-duration: 0.3s;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .svgIcon {
+      width: 12px;
+      transition-duration: 0.3s;
+    }
+    
+    .svgIcon path {
+      fill: white;
+    }
+    
+    .button:hover {
+      width: 140px;
+      border-radius: 50px;
+      transition-duration: 0.3s;
+      background-color: rgb(255, 69, 69);
+      align-items: center;
+    }
+    
+    .button:hover .svgIcon {
+      width: 50px;
+      transition-duration: 0.3s;
+      transform: translateY(60%);
+    }
+    
+    .button::before {
+      position: absolute;
+      top: -20px;
+      content: "Delete";
+      color: white;
+      transition-duration: 0.3s;
+      font-size: 2px;
+    }
+    
+    .button:hover::before {
+      font-size: 13px;
+      opacity: 1;
+      transform: translateY(30px);
+      transition-duration: 0.3s;
+    }
+    </style>
+    
+  </head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light custom-light" id="navbar">
+        <i class='bx bx-menu' id="btn" style="font-size: 30px; padding: 10px;"></i>
+        <div class="logo_name">ClassIQ</div>
+        <div class="search-box">
+           <i class="bx bx-search"></i>
+           <input type="text" placeholder="Search...">
+            
+        </div>
+        
+    </nav>
+    
+      <main role="main" id="layout" class="container">
+        <div class="row">
+          <div class="col-md-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  {{message}}
+                </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+            </div>
+            </div>
+            </main>
+
+            <div class="container layout"> </div>
+
+   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const deleteLinks = document.querySelectorAll('.delete-class');
+      deleteLinks.forEach(link => {
+        link.addEventListener('click', function (event) {
+          event.preventDefault();
+          const classId = link.getAttribute('data-classid');
+          if (confirm('Are you sure you want to delete this class?')) {
+            window.location.href = `/delete_class/${classId}`;
+          }
+        });
+      });
+    });
+
+// Function to open the modal
+function openQuizModal() {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  quizModal.style.display = 'block';
+  overlay.style.display = 'block';
+}
+
+// Function to close the modal
+function closeQuizModal() {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  quizModal.style.display = 'none';
+  overlay.style.display = 'none';
+}
+
+// Close the modal if the dimmed background is clicked
+window.addEventListener('click', (event) => {
+  const quizModal = document.getElementById('quizModal');
+  const overlay = document.getElementById('overlay');
+  if (event.target === overlay) {
+    closeQuizModal(); // Call the close function
+  }
+});
+
+
+    
+  </script>
+  
+</body>
+</html>
+
+
+

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block content %}
+<head>
+    <title>{{ quiz_title }}</title>
+   
+    <style> 
+    #edit-button{ 
+        margin-left: 60%;
+    }
+    </style>
+</head>
+<body>
+    <h1>{{ quiz_title }}</h1>
+    <button type="button" id="edit-button">Edit Quiz</button>
+    <form method="post" action="{{ url_for('save_generated_quiz') }}">
+        <input type="hidden" name="quiz_title" value="{{ quiz_title }}">
+        {% for i in range(questions|length) %}
+            <input type="hidden" name="questions[]" value="{{ questions[i] }}">
+            <input type="hidden" name="options[]" value="{{ options[i] }}">
+        {% endfor %}
+        
+
+        <ul>
+            {% for i in range(questions|length) %}
+                <li>
+                    <p>{{ questions[i] }}</p>
+                    <ul>
+                        {% for option in options[i] %}
+                            <li class="editable">{{ option }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        
+        <button type="submit" id="proceed-button" >Proceed</button>
+    </form>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButton = document.getElementById('edit-button');
+            const proceedButton = document.getElementById('proceed-button');
+            const editableItems = document.querySelectorAll('.editable');
+            
+            editButton.addEventListener('click', function() {
+                editableItems.forEach(item => {
+                    item.contentEditable = true;
+                });
+                editButton.style.display = 'none';
+                proceedButton.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+{% endblock %}

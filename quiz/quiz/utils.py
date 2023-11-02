@@ -4,6 +4,11 @@ from quiz.models import Class, Quiz, ClassStudent,User
 from flask_mail import Message
 from flask import url_for
 from quiz import  mail
+import openai 
+import os 
+
+
+
 
 def get_people(classid):
     people = []
@@ -11,7 +16,6 @@ def get_people(classid):
     for p in classpeople:
         data = User.query.get_or_404(p.user_id)
         people.append(data)
-
     return people
 
 def assignment_added_email(user, title,msgbody):
@@ -50,6 +54,29 @@ def get_users_with_assigned_quiz(class_id):
     return users_with_assigned_quiz
 
 
-def check_class_code(classcode): 
-    classs = Class.query.filter_by(class_code=classcode).first()
-    return classs
+openai.api_key = os.environ.get('OPENAI_API_KEY') 
+
+def generate_quiz_content(prompt):
+
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=1000,
+        n=1
+    )
+    quiz_content = response.choices[0].text.strip()
+    return quiz_content
+
+def generate_quiz_title(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-002",  # Choose the appropriate engine
+        prompt=prompt + "what could be the title of this quiz, just print the title",
+        max_tokens=50,  
+        n = 1  
+    )
+    if response.choices:
+        title = response.choices[0].text.strip()
+        return title
+    else:
+        return "Quiz Title"
+    

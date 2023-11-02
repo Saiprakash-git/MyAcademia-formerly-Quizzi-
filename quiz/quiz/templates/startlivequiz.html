@@ -2,35 +2,16 @@
 {% block content %}
 
 
-<div >
-    <h2>Quiziz</h2> 
-    <fieldset class="participants"> 
-        {% for student in students_in_quiz %}
-    <div class="participant-container">
-        <img class="participant-image" src="{{image_file}}" alt="Participant Image">
-        <div class="participant-name">{{ student['username'] }}</div>
-    </div>
-    
-    {% endfor %}
-    </fieldset>
-        <p id="head"></p>
-        <ul id="participants" style="background-color: aquamarine;"></ul>
-
-</div>
-
     
    
 <div class="quiz-room">
-    <h1>{{ quiztitle }}---QuIz</h1>
+    <h1>{{ quiztitle }}</h1>
     <p>Let participants join <p name="quiz_code">{{ livequiz.quiz_code }}</p></p>
     <small>refresh to see updated content</small>
     
-    
-    
-<h4> {{participants}}</h4>
+<h4 id="participant_count">{{participants}}</h4>
 <a href="{{url_for('exit_quiz')}}" class="btn btn-primary" id="exitquiz">EXIT</a>
   
-    
 
 {% if livequiz.creator_id == current_user.id %}
 <form method="post" action="{{ url_for('running_quiz', quiz_code= livequiz.quiz_code) }}" >
@@ -39,9 +20,72 @@
 </form>
 {% endif %}
 
-</div><script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</div>
 
-  
+<div >
+    
+    <fieldset class="participants" id="participantsFieldset"> 
+        
+
+    </fieldset>
+     
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+   const socket = io({autoconnect: false}); 
+   
+
+  document.addEventListener('DOMContentLoaded', function() {
+    socket.connect(); 
+     
+  });
+  socket.on('quiz_joined', function(data) {
+    
+    const participantsFieldset = document.getElementById('participantsFieldset');
+    const participantContainer = document.createElement('div');
+    participantContainer.classList.add('participant-container');
+
+    const participantImage = document.createElement('img');
+    participantImage.classList.add('participant-image');
+    participantImage.src = '../static/profiles/participant.png';
+    
+ 
+    participantImage.alt = 'Participant Image';
+
+
+    const participantName = document.createElement('div');
+    participantName.classList.add('participant-name');
+    participantName.textContent = data['username'];
+
+    participantContainer.appendChild(participantImage);
+    participantContainer.appendChild(participantName);
+
+    participantsFieldset.appendChild(participantContainer);
+    document.getElementById('participant_count').innerText = data.participant_count;
+    console.log("count::::"+data.participant_count)
+
+
+
+});
+socket.on('quiz_started', function(data) {
+    const quiz_code = data['quiz_code'];
+    window.location.href = 'http://127.0.0.1:5000/running_quiz/'+quiz_code;
+});
+
+</script>
+
+<fieldset class="participants"> 
+    {% for student in students_in_quiz %}
+<div class="participant-container">
+    <img class="participant-image" src="{{image_file}}" alt="Participant Image">
+    <div class="participant-name">{{ student['username'] }}</div>
+</div>
+
+{% endfor %}
+
+</fieldset>
+
 
 
 {% endblock content %}

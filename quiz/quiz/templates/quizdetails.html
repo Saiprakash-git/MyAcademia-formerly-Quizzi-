@@ -2,18 +2,16 @@
 {% block content %}
 <div class="content-section">
 <div class="container mt-4">
-    <h2>Quiz Details</h2>
-    <h3>{{ quiz.title }}</h3>
-    
-    <p>Due Date:</p>
-    <p>Class: {{ quiz.class_id }}</p>
+    <h3 style=" text-align: center;">{{ quiz.title }}</h3>
+    <hr>
+    <br>
+
       Total no of questions:{{ total_questions }}
-      {% if current_user.role == 'teacher' %}
-      <a class="btn btn-primary"  href="{{ url_for('delete_quiz',quiz_id=quiz.id) }}"> Delete quiz</a>
-      {% else %}
-      <form action="{{url_for('start_quiz',quiz_id=quiz.id)}}">
-        <button class="btn btn-secondary">Attempt quiz</button>
-    </form>
+      {% if current_user.id == livequiz.creator_id %}
+      <a class="btn btn-primary"  href="{{ url_for('start_live_quiz',quiz_id=quiz.id) }}"> Start Quiz </a>
+      <a class="btn btn-primary"  href="{{ url_for('delete_quiz',quiz_id=quiz.id) }}"> Delete quiz </a>
+
+
       {% endif %}
       
 </div>

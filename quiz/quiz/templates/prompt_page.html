@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<head>
+    <title>Create Quiz with AI-Prompt</title>
+    <!-- Include your CSS and other dependencies here -->
+</head>
+<body>
+    <header>
+        <!-- Include your navigation bar or header if needed -->
+    </header>
+    
+    <main>
+        <div class="container">
+            <h1>Create Quiz with AI-Prompt</h1>
+            
+            <!-- Form to input the prompt -->
+            <form method="post" action="{{ url_for('prompt_page') }}">
+                <div class="form-group">
+                    <label for="prompt">Enter your prompt:</label>
+                    <textarea class="form-control" id="prompt" name="prompt" rows="5" required></textarea>
+                    <label for="max_limit">Max Limit:1000 words</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Generate Quiz</button>
+            </form>
+        </div>
+    </main>
+
+ 
+{% endblock %}
