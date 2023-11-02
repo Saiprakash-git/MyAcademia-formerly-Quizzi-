@@ -1,36 +1,29 @@
-
+/* .container{ 
+  max-width: 100%;
+}
+ */
 
  hr {color: black;
   height: 1px;
     background: black;}
   
-
+.submissions{ 
+  max-width: 40%;
+  border: 1px solid black;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  
+}
  #classinfo{ 
   border-radius: 8px;
   max-width: 100%;
   padding: 20px;
-  background-image: url(blue.jpg);
+  background-image: url(classbg.jpg);
   background-size: cover;
   
 }
 
-.btn-group a {
-  display: inline-block;
-  margin-right: -20px; /* Add some margin to separate the links */
-}
-.rounded-blue-button {
-  background-color: #3498db; /* Blue background color */
-  border: none;
-  color: white; /* Text color */
-  padding: 10px 20px; /* Padding for the button */
-  border-radius: 10px; /* Rounded border */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
 
 
 #join_quiz {
@@ -38,13 +31,12 @@ max-width: 50%;
   overflow: hidden;
   background-color: #fff;
   position: fixed;
-  top: 50px; /* Adjust the top value to your desired vertical position */
-  right: 60px; /* Adjust the right value to your desired horizontal position */
- 
-  padding: 10px; /* Add padding for better styling */
-  border: 1px solid #ccc; /* Add a border   for better visibility */
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); /* Add a shadow for a card-like appearance */
-  z-index: 999; /* Ensure it appears above other elements */
+  top: 50px;
+  right: 60px; 
+  padding: 10px; 
+  border: 1px solid #ccc;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  z-index: 999; 
 }
 
 #uploadassignment{ 
@@ -52,12 +44,12 @@ max-width: 50%;
   position: fixed;
   max-width: 60%;
   top: 140px;
-  right: 560px;
+  right: 620px;
   padding: 10px;
   text-align: center;
   border: 1px solid gray;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  
   z-index: 669;
 }
 
@@ -335,7 +327,7 @@ p{
 }
   
 label{ 
-  color: #dddddd;
+  color: #3d3737;
 }
 
 

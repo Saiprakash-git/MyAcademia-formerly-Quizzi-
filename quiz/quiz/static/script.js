@@ -17,39 +17,26 @@ function toggleDropdown() {
       dropdown.style.display = "block";
   }
 }
-const socket1 = io();
-socket1.on('redirect_to_quiz', function (quizUrl) {
-    window.location.href = quizUrl;
+let sidebar = document.querySelector(".sidebar");
+let closeBtn = document.querySelector("#btn");
+let searchBtn = document.querySelector(".bx-search");
+closeBtn.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+  menuBtnChange(); //calling the function(optional)
 });
-
+searchBtn.addEventListener("click", () => {
+  // Sidebar open when you click on the search iocn
+  sidebar.classList.toggle("open");
+  menuBtnChange(); //calling the function(optional)
+});
+// following are the code to change sidebar button(optional)
+function menuBtnChange() {
+  if (sidebar.classList.contains("open")) {
+    closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); //replacing the iocns class
+  } else {
+    closeBtn.classList.replace("bx-menu-alt-right", "bx-menu"); //replacing the iocns class
+  }
+}
    
-const socket = io({autoConnect: false}); 
-socket.connect('http://127.0.0.1:5000');  // Use the base URL of your Flask application
-
-
-socket.on('connect', () => {
-    console.log('Connected to the WebSocket server');
-});
-
-socket.on('participant_joined', (data) => {
-    const head = document.getElementById('head');
-    head.textContent +="participants";
-    console.log("User: " + data.username + " joined");
-    const participantsList = document.getElementById("participants");
-    const participantItem = document.createElement("li");
-    participantItem.textContent = `User: ${data.username}`;
-    participantsList.appendChild(participantItem);
-});
-
-socket.on('disconnect', () => {
-    console.log('Disconnected from the WebSocket server');
-});
-
-socket.on('connect_error', (error) => {
-    console.error('WebSocket connection error:', error);
-});
-
-
-
 
 
