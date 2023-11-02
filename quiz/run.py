@@ -1,15 +1,29 @@
-from quiz import app, socketio
+# from quiz import app, socketio
 
 
-from flask import Flask, request, session
-import uuid
 
-@app.before_request
-def add_tab_identifier():
-    if 'tab_id' not in session:
-        session['tab_id'] = str(uuid.uuid4())
+# if __name__ == '__main__':
+#    app.run(debug=True)
+
+# socketio.run(app,debug=True)
+
+
+# from flask import Flask
+# from flask_socketio import SocketIO
+
+# if __name__ == '__main__':
+#    app.run(debug=True)
+
+# app = Flask(__name__)
+# socketio = SocketIO(app, async_mode="eventlet")
+
+# ... rest of your code ...
+from quiz import app,socketio
+
+
 
 if __name__ == '__main__':
-
-   socketio.run(app,debug=True)
-
+   app.run(debug=True)
+if __name__ == '__main__':
+    socketio.run(app)
+  

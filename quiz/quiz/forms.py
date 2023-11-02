@@ -35,12 +35,14 @@ class RegistrationForm(FlaskForm):
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
         
+        
 class LoginForm(FlaskForm): 
     username = StringField('pin/username',
                         validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
 
 class AddClass(FlaskForm): 
     classname = StringField('Classname', validators=[DataRequired(), Length(min=3, max=30)])
@@ -60,10 +62,10 @@ class AddAssignment(FlaskForm):
     assignmentdescription = TextAreaField('assignmentdescription',validators=[DataRequired()])
     duedate = DateField('due_date', format='%Y-%m-%d', validators=[DataRequired()])
     attachment = FileField('Attachment')
-    points = IntegerField('points',validators=[DataRequired()])   
+    class_id = SelectField('Class', coerce=int)      
     submit = SubmitField('Add Assignment')
 
-class UpdateAccount(FlaskForm):   
+class UpdateAccount(FlaskForm): 
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
@@ -96,8 +98,10 @@ class AddQuizForm(FlaskForm):
     options = FieldList(StringField('Option'), min_entries=1)
     submit = SubmitField('Add Quiz')
 
+    
 class AddLiveQuizForm(FlaskForm):
     title = StringField('Quiz Title', validators=[DataRequired()])
+
     timer = IntegerField('Question Timer (seconds)', validators=[DataRequired(), NumberRange(min=1)])
     num_questions = IntegerField('Number of Questions', validators=[DataRequired(), NumberRange(min=1)])
     questions = FieldList(StringField('Question'), min_entries=1)

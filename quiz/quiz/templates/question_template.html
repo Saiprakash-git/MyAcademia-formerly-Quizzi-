@@ -1,47 +1,84 @@
+
 {% extends "layout.html" %}
-    {% block content %}
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Quiz App</title>
-    </head>
-    <body>
-        <div class="content-section" id="classinfo">
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz App</title>
+    <style>
+        /* Center the classinfo div horizontally and vertically */
+        #classinfo {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0%;
+            left: 40%;
+            height: 70vh;
+            width: 85vh; /* Set the height to the viewport height for vertical centering */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content-section" id="classinfo">
         <h1>{{ quiz.title }}</h1>
         <p>Timer: <span id="timer">{{ quiz.timer }}</span> seconds</p>
         <p>Question {{ session['current_question'] + 1 }} of {{ quiz.questions|length }}</p>
         <p>{{ question.text }}</p>
         <form method="POST" id="quiz-form">
-            <input type="radio" name="answer" value="{{ options.option1 }}" required> {{ options.option1 }}<br>
-            <input type="radio" name="answer" value="{{ options.option2 }}"> {{ options.option2 }}<br>
-            <input type="radio" name="answer" value="{{ options.option3 }}"> {{ options.option3 }}<br>
-            <input type="radio" name="answer" value="{{ options.option4 }}"> {{ options.option4 }}<br>
-            <input type="submit" value="Submit">
+            {% for option in l1 %}
+                <button type="button" class="btn btn-primary answer-button" data-answer="{{ option }}" onclick="selectAnswer('{{ option }}')">{{ option }}</button>
+            {% endfor %}
+            <input type="hidden" name="selected_answer" id="selected-answer-input">
         </form>
+        
+        <p id="selected-answer"></p>
+        
+        
+        
+        
     </div>
-        {% block javascript %}
-        <script>
-            // Countdown timer
-            let timeLeft = {{ timer }};
-            const timerElement = document.getElementById("timer");
-            const quizForm = document.getElementById("quiz-form");
+    {% block javascript %}
+<script>
+    const answerButtons = document.querySelectorAll('.answer-button');
+    const selectedAnswerElement = document.getElementById('selected-answer');
 
-            function updateTimer() {
-                timerElement.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    // Time's up, automatically submit the form
-                    quizForm.submit();
-                } else {
-                    // Decrement the timer and update every second
-                    timeLeft--;
-                    setTimeout(updateTimer, 1000);
-                }
-            }
+    function selectAnswer(answer) {
+        const selectedAnswerInput = document.getElementById('selected-answer-input');
+        selectedAnswerInput.value = answer;
+    }
 
-            // Start the timer when the page loads
-            updateTimer();
-        </script>
-    </body>
-    </html>
-    {% endblock %}
-    {% endblock content %}
+    answerButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const selectedAnswer = this.getAttribute('data-answer');
+            selectedAnswerElement.textContent = `Selected Answer: ${selectedAnswer}`;
+        });
+    });
+
+
+    // Countdown timer
+    let timeLeft = JSON.parse('{{ timer }}');
+    const timerElement = document.getElementById("timer");
+    const quizForm = document.getElementById("quiz-form");
+
+    function updateTimer() {
+        timerElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+            // Time's up, automatically submit the form
+            quizForm.submit();
+        } else {
+            // Decrement the timer and update every second
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
+    // Start the timer when the page loads
+    updateTimer();
+</script>
+{% endblock %}
+</body>
+</html>
+
+{% endblock content %}
+

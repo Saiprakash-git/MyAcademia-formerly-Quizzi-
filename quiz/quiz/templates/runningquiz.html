@@ -24,7 +24,8 @@
   <script>
 
    
-
+    const url = window.location.href;
+socket.emit('quiz_started', { quizUrl: url });
 
     // JavaScript code for timer countdown
     var timers = document.querySelectorAll('[id^="timer_"]');

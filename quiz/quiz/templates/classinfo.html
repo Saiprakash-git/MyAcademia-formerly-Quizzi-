@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="space"> </div>
+
 <div class="classinfoo">
 <div  >
     <div class="class-info-container">
@@ -28,29 +28,20 @@
                     
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" href="{{ url_for('add_assignment') }}">Assignment</a>
-                        <button id="addQuizButton" class="dropdown-item" onclick="openPopup()">Quiz</button>
-
+                        <form method="POST" action="{{ url_for('add_livequiz', class_id=classinfo.id) }}" class="form-group">
+                            <input type="hidden" name="class_id" value="{{ classinfo.id }}">
+                       
+                            <button type="submit" class="dropdown-item"> Quiz</button>
+                        </form>
                        
                 </div>
-            </div>
-            <!-- The pop-up container -->
-            <div id="quizPopup" class="popup">
-                <div class="popup-content">
-                    <span class="close" onclick="closePopup()">&times;</span>
-                    <h2>Create Quiz</h2>
-                    <button class="quiz-ai-btn" ><a href="{{ url_for('prompt_page')}}">Create with AI Prompt</a></button>
-                    <button class="quiz-txt-btn">Import from Text File</button>
-                    <form method="POST" action="{{ url_for('add_livequiz', class_id=classinfo.id) }}" class="form-group">
-                        <input type="hidden" name="class_id" value="{{ classinfo.id }}">
-                   
-                        <button type="submit" class="dropdown-item"> Custom Quiz</button>
-                    </form>
-                </div>
-            </div>
+            </div>                <a href="{{ url_for('teacher_dashboard', class_id=classinfo.id) }}" class="btn btn-primary">Avg</a>
+
                 </div>
                 </div>
                 </div>
-        
+         
+
             {% else %}
             <div class="bg">
                 <div class="container">
@@ -63,7 +54,8 @@
                         <button class="btn btn-primary">Exit class</button>
                     </form>
                 </div>
-                    
+                <a href="{{ url_for('student_results', class_id=classinfo.id) }}" class="btn btn-primary">avg</a>
+
                             
                           
                         </div>
@@ -107,19 +99,23 @@
                         </div>
                     {% endfor %}
                     </div>
-                    <div class="col-md-6">
-                        {% for quiz in quizzes %}
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                      
-                                        <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{quiz.title}}</a>
-                                        <p class="card-text">code: {{quiz.quiz_code}}</p>
-                                        <a href="{{url_for('quiz_result',quiz_id=quiz.id)}}" class="btn btn-primary">Get results</a>
-                                        <p class="card-text"> </p>
-                                    </div>
-                                </div>
-                                {% endfor %}
+                    
+
+                    {% for quiz in quizzes %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ quiz.title }}</h5>
+                            <p class="card-text">{{ quiz.description }}</p>
+                            <p class="card-text">Code: {{ quiz.quiz_code }}</p>
+                            <a href="{{url_for('start_live_quiz',quiz_id=quiz.id)}}" class="btn btn-primary" target="_blank">Start Now</a>
+            
+                            <a href="{{ url_for('combine_results', quiz_id=quiz.id) }}" class="btn btn-primary">Results</a>
+                            
+                            <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-primary">Details</a>                                      
+                            <p class="card-text"> </p>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
             {%else%}
@@ -147,7 +143,17 @@
                                 <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="card-title">{{ quiz.title }}</a>
                                 <p class="card-text">code: {{ quiz.quiz_code }}</p>
                                 
-                              
+                                {% if quiz.id in quizlog %}
+                                    <p class="card-text">Previous Result: {{ quizlog[quiz.id].total_marks }}</p>
+                                    <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                        <button class="btn btn-secondary">Re-attempt</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{{ url_for('start_quiz', quiz_id=quiz.id) }}">
+                                        <button class="btn btn-secondary">Attempt quiz</button>
+                                    </form>
+                                {% endif %}
+                                
                                 <p class="card-text"> </p>
                             </div>
                         </div>
@@ -196,15 +202,6 @@
     
     handleTabClick(tab1, tabContent1); // Initialize with the first tab as active
     
-    function openPopup() {
-    document.getElementById("quizPopup").style.display = "block";
-}
-
-function closePopup() {
-    document.getElementById("quizPopup").style.display = "none";
-}
-
-
-
+  
   </script>
 {% endblock %}
