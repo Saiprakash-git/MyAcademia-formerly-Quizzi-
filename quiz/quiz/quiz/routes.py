@@ -277,6 +277,7 @@ def delete_quiz(quiz_id):
     flash('Quiz has been Deleted', 'success')
     return redirect(url_for('class_info', classid=classid))
 
+
 @app.route('/quiz/<int:quiz_id>/results')
 def quiz_result(quiz_id): 
     return ''
