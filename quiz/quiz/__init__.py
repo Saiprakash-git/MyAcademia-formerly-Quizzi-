@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_sse import sse
+
 import os
 
 app = Flask(__name__)
@@ -17,8 +17,7 @@ with app.app_context():
     SUBMIT_FOLDER = os.path.join(app.root_path, 'static', 'submits')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOL
     app.config['SUBMIT_FOLDER'] = SUBMIT_FOLDER
-    # app.config["REDIS_URL"] = "redis://localhost:6379/0"  # Use Redis as the message broker
-    # app.register_blueprint(sse, url_prefix='/stream')
+ 
 
 socketio = SocketIO(app)
 db = SQLAlchemy(app)

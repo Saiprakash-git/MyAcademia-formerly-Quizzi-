@@ -1,4 +1,4 @@
-from quiz import app,db, bcrypt, socketio , sse
+from quiz import app,db, bcrypt, socketio 
 from quiz.models import User
 from quiz.forms import RegistrationForm,LoginForm , UpdateAccount
 from flask import  render_template, redirect, session, url_for, request, flash, request
