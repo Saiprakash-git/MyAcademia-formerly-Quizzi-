@@ -120,3 +120,14 @@ class QuizLog(db.Model):
     
     def __repr__(self):
         return f"QuizLog('Quiz ID: {self.quiz_id}', 'Student ID: {self.student_id}', 'Entered Answer: {self.entered_answer}', 'Correct Answer: {self.correct_answer}', 'Total Marks: {self.total_marks}')"
+    
+class QuizResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_marks = db.Column(db.Integer, nullable=False)
+    quiz = db.relationship('Quiz', backref='results')
+
+
+    def __repr__(self):
+        return f"QuizResult('Quiz ID: {self.quiz_id}', 'Student ID: {self.student_id}', 'Total Marks: {self.total_marks}')"

@@ -1,6 +1,6 @@
 from flask_socketio import emit, join_room
 from quiz import app,db,socketio
-from quiz.models import Class,Quiz,Option, Question, LiveQuiz, QuizLog, User, QuizAttempts
+from quiz.models import Class,Quiz,Option, Question, LiveQuiz, QuizLog, User, QuizAttempts,QuizResult
 from quiz.forms import AddQuizForm, AddLiveQuizForm
 from flask_login import  current_user, login_required
 from quiz.utils import quizcode_generator , live_quizcode_generator, generate_quiz_content, generate_quiz_title
@@ -202,58 +202,312 @@ def exit_quiz():
     return redirect(url_for('home'))
 
 
+# @app.route('/running_quiz/<int:quiz_code>', methods=['GET','POST'])
+# def running_quiz(quiz_code):
+#     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
+#     if quiz is None:
+#         return "Invalid quiz code"
+#     socketio.emit('quiz_started',{'quiz_code':quiz_code})
+#     question = quiz.questions
+#     import random
+#     questions = list(question)
+#     random.shuffle(questions)
+#     # Initialize the session variables for storing the current question index and the score
+#     if 'current_question' not in session:
+#         session['current_question'] = 0
+#     if 'score' not in session:
+#         session['score'] = 0
+    
+#     # Check if the user has submitted an answer
+#     if request.method == 'POST':
+#         print("fromm consollllleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+#         # Get the user's answer from the form
+#         answer = request.form.get('answer')
+#         # Get the correct answer from the database
+#         correct_answer = questions[session['current_question']].options[0].option4 # Assuming option1 is always correct
+#         # Compare the user's answer with the correct answer and update the score accordingly
+#         if answer == correct_answer:
+#             session['score'] += 1
+#         # Increment the current question index by 1	
+#         session['current_question'] += 1
+#     # Check if there are more questions left
+#     if session['current_question'] < len(questions):
+#         # Get the current question object
+#         question = questions[session['current_question']]
+#         # Get the options for the current question
+#         if question.options:
+#             options = question.options[0]
+#         else:
+#              options = None
+        
+#         # Render the quiz template with the quiz, question, and options data
+#         return render_template('question_template.html', quiz=quiz, question=question, options=options, timer=quiz.timer)
+    
+#     else:
+#         result = session['score']
+#         # Reset the session variables
+#         session.pop('current_question')
+#         session.pop('score')
+#         # Render a message to indicate that the quiz is over
+#         # quizlog = QuizLog(quiz_id=quiz.id,student_id=current_user.id,entered_answer=answer, correct_answer=correct_answer, total_marks=result)
+#         # db.session.add(quizlog)
+#         # db.session.commit()
+#         return render_template("quizresult.html",result=result)
 @app.route('/running_quiz/<int:quiz_code>', methods=['GET','POST'])
 def running_quiz(quiz_code):
+    # quiz = Quiz.query.get(quiz_code)
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
-    if quiz is None:
-        return "Invalid quiz code"
-    socketio.emit('quiz_started',{'quiz_code':quiz_code})
-    question = quiz.questions
+    live_quiz = LiveQuiz.query.filter_by(quiz_id=quiz.id).first()
+    user_is_creator = live_quiz.creator_id == current_user.id
+# Set the seed with the user's ID
     import random
+
+    random.seed(current_user.id)
+
+# Check if the quiz exists
+    if quiz is None:
+         return "Invalid quiz code"
+    socketio.emit('quiz_started',{'quiz_code':quiz_code})
+
+    existing_participation = QuizResult.query.filter_by(quiz_id=quiz.id, student_id=current_user.id).first()
+
+    # if existing_participation is not None:
+    #     flash("You have already taken this quiz.","danger")
+    #     return redirect(url_for('quizresult', quiz_code=quiz_code))
+
+
+    
+    question = quiz.questions
     questions = list(question)
+
+# Shuffle the questions
     random.shuffle(questions)
+
+    print(questions)
+
+    import random
+    # Convert questions to a list
     # Initialize the session variables for storing the current question index and the score
     if 'current_question' not in session:
         session['current_question'] = 0
-    if 'score' not in session:
-        session['score'] = 0
+    # Shuffle the questions randomly and select a subset
+
     
-    # Check if the user has submitted an answer
-    if request.method == 'POST':
-        print("fromm consollllleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-        # Get the user's answer from the form
-        answer = request.form.get('answer')
-        # Get the correct answer from the database
-        correct_answer = questions[session['current_question']].options[0].option4 # Assuming option1 is always correct
-        # Compare the user's answer with the correct answer and update the score accordingly
-        if answer == correct_answer:
-            session['score'] += 1
-        # Increment the current question index by 1	
+ # Initialize 'answer' with a default value
+ # Check if the user has submitted an answer
+    if request.method == 'POST':   
+      if user_is_creator:
         session['current_question'] += 1
-    # Check if there are more questions left
+      else:
+
+         answer = request.form.get('selected_answer')
+         print(answer)
+         print(answer)
+
+        #  answer_data = request.get_json()
+        #  entered_answer = answer_data.get('answer')
+
+        # Get the correct answer from the database
+         correct_answer = questions[session['current_question']].options[0].option4 # Assuming option1 is always correct
+         result =0
+         quizlog = QuizLog(quiz_id=quiz.id,student_id=current_user.id,entered_answer= answer, correct_answer=correct_answer,total_marks=result)
+         db.session.add(quizlog)
+         db.session.commit()            
+        # Increment the current question index by 1	
+         session['current_question'] += 1
+        # Check if there are more questions left
     if session['current_question'] < len(questions):
         # Get the current question object
         question = questions[session['current_question']]
         # Get the options for the current question
         if question.options:
             options = question.options[0]
+            l1=[options.option1, options.option2,options.option3,options.option4]
+            print(l1)
+            random.seed()
+            random.shuffle(l1)
+            print(l1)
+
         else:
              options = None
-        
-        # Render the quiz template with the quiz, question, and options data
-        return render_template('question_template.html', quiz=quiz, question=question, options=options, timer=quiz.timer)
+    # Determine the template to render based on whether the user is the creator
+        if user_is_creator:
+            template_name = 'teacher_questions.html'
+        else:
+            template_name = 'question_template.html'
     
-    else:
-        result = session['score']
-        # Reset the session variables
-        session.pop('current_question')
-        session.pop('score')
-        # Render a message to indicate that the quiz is over
-        # quizlog = QuizLog(quiz_id=quiz.id,student_id=current_user.id,entered_answer=answer, correct_answer=correct_answer, total_marks=result)
-        # db.session.add(quizlog)
-        # db.session.commit()
-        return render_template("quizresult.html",result=result)
+        # Render the quiz template with the quiz, question, and options data
+        return render_template( template_name, quiz=quiz, question=question, l1=l1, timer=quiz.timer)
+    
 
+        # if user_is_creator:
+        # # Render the quiz template with the quiz, question, and options data
+        #     return render_template( 'teacher_questions.html', quiz=quiz, question=question, l1=l1, timer=quiz.timer)
+        # else:
+        #     return render_template( 'question_template.html', quiz=quiz, question=question, l1=l1, timer=quiz.timer)
+
+
+    else:
+        print(session.pop('current_question'))
+
+        return redirect(url_for('quizresult', quiz_code=quiz_code))
+        
+
+
+@app.route('/quizresult/<int:quiz_code>')
+@login_required  # Ensure the user is logged in
+def quizresult(quiz_code):
+    # Retrieve the quiz object
+    quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
+    live_quiz = LiveQuiz.query.filter_by(quiz_id=quiz.id).first()
+
+    # Check if the quiz exists
+    if quiz is None:
+        return "Invalid quiz code"
+    
+    if live_quiz.creator_id == current_user.id:
+        return redirect(url_for('combine_results', quiz_id =live_quiz.quiz_id))
+
+    # Calculate the total marks for the current student
+    student_id = current_user.id  # Assuming you have a way to get the current user's ID
+    
+
+    quiz_logs = QuizLog.query.filter_by(quiz_id=quiz.id, student_id=student_id).all()
+    
+    total_marks = 0
+
+   # Initialize total_marks outside the loop
+    for quiz_log in quiz_logs:
+
+        if quiz_log.entered_answer == quiz_log.correct_answer:
+            total_marks += 1  # Increment total_marks when the condition is met
+
+    print(total_marks)   # Initialize total_marks outside the loop
+ # This will print the total number of correct answers
+
+    
+    # Create a new entry in the results table
+    quiz_result = QuizResult(quiz_id=quiz.id, student_id=student_id, total_marks=total_marks)
+    db.session.add(quiz_result)
+    db.session.commit()
+
+    # You can also query and display the results for the current student
+    student_results = QuizResult.query.filter_by(student_id=student_id).all()
+
+    return render_template('quizresult.html', result=quiz_result, total_marks=total_marks, student_results=student_results)
+
+@app.route('/combine_results/<int:quiz_id>')
+def combine_results(quiz_id):
+    # Retrieve quiz results for the specified quiz
+    results = QuizResult.query.filter_by(quiz_id=quiz_id).all()
+    quiz = Quiz.query.get_or_404(quiz_id)
+    total_questions = len(quiz.questions)
+
+    # Create a dictionary to store results grouped by student
+    student_results = {}
+
+    for result in results:
+        student_id = result.student_id
+        total_marks = result.total_marks
+
+        # Get the student's username
+        user = User.query.get(student_id)
+        student_name = user.username
+
+        # If the student is not in the dictionary, create an entry
+        if student_name not in student_results:
+            student_results[student_name] = {
+                'total_marks': total_marks,
+                'results': []
+            }
+
+        # Append the result for the student
+        student_results[student_name]['results'].append(total_marks)
+
+    return render_template('combine_results.html', student_results=student_results, max_marks=total_questions)
+
+@app.route('/teacher_dashboard/<int:class_id>')
+@login_required
+def teacher_dashboard(class_id):
+    # ... your existing code to fetch live quizzes and quiz results ...
+    current_class = Class.query.get_or_404(class_id)
+    if current_user.id != current_class.creator_id:
+        flash('You do not have access to this class.', 'danger')
+        return redirect(url_for('main.home'))
+
+    # Get all live quizzes for the specified class
+    live_quizzes = LiveQuiz.query.filter_by(class_id=class_id).all()
+
+    # Create a dictionary to store average quiz scores for each student
+    student_avg_scores = {}
+
+    # Fetch all the quizzes associated with the class
+    quizzes = Quiz.query.filter_by(class_id=class_id).all()
+
+    # Determine the number of quizzes for which you want to calculate the average
+    num_quizzes_to_use = len(quizzes)
+
+
+    for quiz in quizzes:
+        quiz_id = quiz.id
+        quiz_results = QuizResult.query.filter_by(quiz_id=quiz_id)
+
+        for result in quiz_results:
+            student = result.student_id
+
+            # Retrieve the student's name based on the ID
+            student_name = User.query.get(student).username
+
+            total_marks = result.total_marks
+
+            if student_name not in student_avg_scores:
+                student_avg_scores[student_name] = {
+                    'total_marks': total_marks,
+                    'num_quizzes': 1,
+                    'quiz_marks': {quiz_id: total_marks}
+                }
+            else:
+                student_avg_scores[student_name]['total_marks'] += total_marks
+                student_avg_scores[student_name]['num_quizzes'] += 1
+                student_avg_scores[student_name]['quiz_marks'][quiz_id] = total_marks
+
+    # Calculate the average score for each student using the specified number of quizzes
+    for student, data in student_avg_scores.items():
+        total_marks = data['total_marks']
+        num_quizzes = num_quizzes_to_use  # Use the constant number of quizzes
+        average_score = round(total_marks / num_quizzes, 2)
+        student_avg_scores[student]['average_score'] = average_score
+
+    return render_template('teacher_dashboard.html', live_quizzes=live_quizzes, student_avg_scores=student_avg_scores, quizzes=quizzes)
+
+
+
+@app.route('/student_results/<int:class_id>')
+@login_required
+def student_results(class_id):
+    # Get the class based on the provided class_id
+    current_class = Class.query.get_or_404(class_id)
+    
+    # Check if the current user is a member of this class
+    
+    # Fetch all quizzes associated with the class
+    quizzes = Quiz.query.filter_by(class_id=class_id).all()
+    
+    # Create a dictionary to store the student's results for each quiz
+    student_quiz_results = {}
+    
+    # Loop through the quizzes and fetch the results for the current user
+    for quiz in quizzes:
+        quiz_id = quiz.id
+        
+        # Fetch the quiz results for the current user and quiz
+        quiz_result = QuizResult.query.filter_by(quiz_id=quiz_id, student_id=current_user.id).first()
+        
+        if quiz_result:
+            # If results are found, add them to the dictionary
+            student_quiz_results[quiz.title] = quiz_result.total_marks
+    
+    return render_template('student_results.html', student_quiz_results=student_quiz_results)
 
 @app.route('/quiz_details/<int:quiz_id>')
 def quiz_details(quiz_id):

@@ -15,67 +15,49 @@
             height: 70vh;
             width: 85vh; /* Set the height to the viewport height for vertical centering */
         }
-
-        /* Timer bar styles */
-        /* Timer bar styles with rounded borders */
-#timer-bar {
-    height: 10px;
-    background-color: #3498db; /* Blue color */
-    width: 100%;
-    position: relative;
-    border-radius: 10px; /* Rounded border for timer bar */
-}
-
-#progress-bar {
-    height: 100%;
-    width: 100%;
-    background-color: #2ecc71; /* Green color */
-    position: absolute;
-    transition: width 1s linear;
-    border-radius: 10px; /* Rounded border for progress bar */
-}
-
     </style>
 </head>
 <body>
 
     <div class="content-section" id="classinfo">
-        <h1>Quiz:{{ quiz.title }}</h1>
-        <p id="remaining-time"></p>
-        <div id="timer-bar">
-            <div id="progress-bar"></div>
-        </div><br>
-        <p>Question {{ session['current_question'] + 1 }} of {{ quiz.questions|length }}</p>
-        <p>Q{{ session['current_question'] + 1 }}.{{ question.text }}</p>
-        <!-- Timer bar -->
-        
+        <h1 style="text-align: center;">Quiz: {{ quiz.title }}</h1>
+        <p>Timer: <span id="timer">{{ quiz.timer }}</span> seconds</p>
+
+        <b><h1 style="text-align: center;">Question {{ session['current_question'] + 1 }} of {{ quiz.questions|length }}</h1>
+            <h1 style="text-align: center;"> QUESTION {{ session['current_question'] + 1 }} </h1>
+
+        </b>
+        <a href="{{ url_for('quiz_detail', quiz_code=quiz.quiz_code) }}" class="btn btn-primary">Quiz Details</a>
+
+
+        <form method="POST" id="quiz-form">
+
+        </form>
     </div>
     {% block javascript %}
-    <script>
-        // Countdown timer
-        let timeLeft = JSON.parse('{{ timer }}');
-        const progressBar = document.getElementById("progress-bar");
-        const remainingTime = document.getElementById("remaining-time");
-    
-        function updateTimer() {
-            if (timeLeft <= 0) {
-                // Time's up, automatically submit the form or take some action
-                progressBar.style.width = '0%';
-                remainingTime.textContent = 'Time\'s up';
-            } else {
-                const progressWidth = (timeLeft / JSON.parse('{{ quiz.timer }}')) * 100;
-                progressBar.style.width = `${progressWidth}%`;
-                remainingTime.textContent = `${timeLeft} seconds left`;
-                timeLeft--;
-                setTimeout(updateTimer, 1000);
-            }
+<script>
+    // Countdown timer
+    let timeLeft = JSON.parse('{{ timer }}');
+    const timerElement = document.getElementById("timer");
+    const quizForm = document.getElementById("quiz-form");
+
+    function updateTimer() {
+        timerElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+            // Time's up, automatically submit the form
+            quizForm.submit();
+        } else {
+            // Decrement the timer and update every second
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
         }
-    
-        // Start the timer when the page loads
-        updateTimer();
-    </script>
-       
-        {% endblock %}
+    }
+
+    // Start the timer when the page loads
+    updateTimer();
+</script>
+{% endblock %}
 </body>
 </html>
+
 {% endblock content %}
