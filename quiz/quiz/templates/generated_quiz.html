@@ -4,52 +4,43 @@
     <title>{{ quiz_title }}</title>
    
     <style> 
-    #edit-button{ 
-        margin-left: 60%;
+    .editable {
+        border: 1px solid #ccc;
+        margin: 5px;
+        padding: 5px;
+    }
+    .add-question-btn, .add-option-btn, .delete-question-btn, .delete-option-btn {
+        margin: 10px;
     }
     </style>
 </head>
 <body>
     <h1>{{ quiz_title }}</h1>
-    <button type="button" id="edit-button">Edit Quiz</button>
-    <form method="post" action="{{ url_for('save_generated_quiz') }}">
+    <form method="post" action="{{ url_for('save_generated_quiz') }}" id="quiz-form">
+        
         <input type="hidden" name="quiz_title" value="{{ quiz_title }}">
+        <input type="hidden" name="prompt" value="{{ prompt }}">
+        
         {% for i in range(questions|length) %}
             <input type="hidden" name="questions[]" value="{{ questions[i] }}">
-            <input type="hidden" name="options[]" value="{{ options[i] }}">
-        {% endfor %}
-        
-
-        <ul>
-            {% for i in range(questions|length) %}
-                <li>
-                    <p>{{ questions[i] }}</p>
-                    <ul>
-                        {% for option in options[i] %}
-                            <li class="editable">{{ option }}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
+            {% for option in options[i] %}
+                <input type="hidden" name="options_{{ i }}[]" value="{{ option }}">
             {% endfor %}
-        </ul>
-        
-        <button type="submit" id="proceed-button" >Proceed</button>
-    </form>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const editButton = document.getElementById('edit-button');
-            const proceedButton = document.getElementById('proceed-button');
-            const editableItems = document.querySelectorAll('.editable');
+            <input type="hidden" name="correct_options[]" value="{{ correct_options[i] }}">
             
-            editButton.addEventListener('click', function() {
-                editableItems.forEach(item => {
-                    item.contentEditable = true;
-                });
-                editButton.style.display = 'none';
-                proceedButton.style.display = 'block';
-            });
-        });
-    </script>
+            <div class="editable">
+                <p>{{ questions[i] }}</p>
+                <ul>
+                    {% for option in options[i] %}
+                        <li>{{ option }}</li>
+                    {% endfor %}
+                </ul>
+                <p>Correct Option: {{ correct_options[i] }}</p>
+            </div>
+        {% endfor %}
+        <Label>Timer:</Label>
+        <input type="text" name="quiz_timer" >
+        <button type="submit">Proceed</button>
+    </form>
 </body>
 {% endblock %}

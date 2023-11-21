@@ -1,17 +1,17 @@
 from flask_wtf import FlaskForm  
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, NumberRange,Optional
 from wtforms import (SubmitField, StringField, PasswordField, BooleanField, 
-                     SelectField, FileField, DateField, TextAreaField, IntegerField, FieldList)
+                     SelectField, FileField, DateField, TextAreaField, IntegerField, FieldList, FormField)
 from quiz.models import User, Class
 from flask_login import current_user
-
-
 
 class RegistrationForm(FlaskForm): 
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+    role = SelectField('Role', choices=[('choose', 'Choose...'),('teacher', 'Teacher'), ('student', 'Student')])
+
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
@@ -104,6 +104,15 @@ class AddLiveQuizForm(FlaskForm):
     options = FieldList(StringField('Option'), min_entries=1)
     submit = SubmitField('Add Quiz')
 
-class JoinQuiz(FlaskForm):
-    quiz_code = StringField('Quiz Code',validators=[DataRequired()])
-    submit = SubmitField('Submit')
+from flask_wtf import FlaskForm
+from wtforms import StringField, IntegerField
+
+class QuestionForm(FlaskForm):
+    question_text = StringField('Question')
+    options = FieldList(StringField('Option'))
+
+class GenerateQuizForm(FlaskForm):
+    title = StringField('Title')
+    timer = IntegerField('Question Timer (seconds)')
+    num_questions = IntegerField('Number of Questions')
+    questions = FieldList(FormField(QuestionForm))

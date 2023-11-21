@@ -6,7 +6,7 @@
         <fieldset class="form-group">
             <legend class="border-bottom mb-4">Join Today</legend>
             <div class="form-group">
-                {{ form.username.label(class="form-control-label") }}
+                {{ form.username.label(class="form-control-label", placeholder="Name/Pin") }}
                 
                 {% if form.username.errors %}
                     {{ form.username(class="form-control form-control-lg is-invalid") }}
@@ -16,7 +16,7 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    {{ form.username(class="form-control form-control-lg") }}
+                    {{ form.username(class="form-control form-control-lg", placeholder="Name/Pin") }}
                 {% endif %}
             </div>
            
@@ -34,7 +34,24 @@
                 {% endif %}
             </div>
            
-            
+            <div class="form-group">
+                {{ form.role.label(class="form-control-label") }}
+                {% if form.role.errors %}
+                    <div class="form-select">
+                    <option selected disabled value="">Choose...
+                    {{ form.role(class="form-control form-control-lg is-invalid") }}
+                    </option>
+                    </div>
+                    <div class="invalid-feedback">
+                        {% for error in form.role.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.role(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+           
             <div class="form-group">
                 {{ form.password.label(class="form-control-label") }}
                 {% if form.password.errors %}

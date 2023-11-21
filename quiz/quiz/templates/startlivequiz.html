@@ -35,7 +35,6 @@
 <script>
    const socket = io({autoconnect: false}); 
    
-
   document.addEventListener('DOMContentLoaded', function() {
     socket.connect(); 
      
@@ -70,9 +69,9 @@
 });
 socket.on('quiz_started', function(data) {
     const quiz_code = data['quiz_code'];
-    window.location.href = 'http://127.0.0.1:5000/running_quiz/'+quiz_code;
+    const quizUrl = window.location.origin + '/running_quiz/' + quiz_code;
+    window.location.href = quizUrl;
 });
-
 </script>
 
 <fieldset class="participants"> 

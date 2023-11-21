@@ -5,23 +5,24 @@ from flask_login import UserMixin
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
+    
 class ClassStudent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'), nullable=False)
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    role = db.Column(db.String(7), nullable=False)
     classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic', cascade="all, delete-orphan")
-    quizzes = db.relationship('LiveQuiz', backref='user', lazy=True, cascade="all, delete-orphan")
+    quizzes = db.relationship('Quiz', backref='user', lazy=True, cascade="all, delete-orphan")
     quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts', lazy='dynamic', cascade="all, delete-orphan")
     assignments = db.relationship('Assignment', backref='user', lazy=True, cascade="all, delete-orphan")
 
-    
 
 class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -58,33 +59,41 @@ class Assignment_Score(db.Model):
     points = db.Column(db.Integer, nullable=False)
     points_scored = db.Column(db.Integer)
    
-
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_id = db.Column(db.Integer, db.ForeignKey('class.id'))
     quiz_code = db.Column(db.String(5), nullable=False, unique=True)
     title = db.Column(db.String(100), nullable=False)
-    timer = db.Column(db.Integer)  
-    questions = db.relationship('Question', backref='quiz', lazy=True)
-    options = db.relationship('Option', backref='quiz', lazy=True)
+    timer = db.Column(db.Integer)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    datetime = db.Column(db.DateTime, nullable=False)
+    questions = db.relationship('Question', backref='quiz', lazy=True, cascade='all, delete-orphan')
+    prompt_uploaded = db.relationship('PromptQuiz', backref='quiz', lazy=True, cascade='all, delete-orphan')
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     text = db.Column(db.String(500), nullable=False)
+    # Relationship with Option
     options = db.relationship('Option', backref='question', lazy=True)
 
 class Option(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    option1 = db.Column(db.String(200), nullable=False)
-    option2 = db.Column(db.String(200), nullable=False)
-    option3 = db.Column(db.String(200), nullable=False)
-    option4 = db.Column(db.String(200), nullable=False)
-    is_correct = db.Column(db.Boolean, default=False) 
-    def _repr_(self):
-        return f"Option('Option 1: {self.option1}', 'Option 2: {self.option2}', 'Option 3: {self.option3}', 'Option 4: {self.option4}','Is Correct: {self.is_correct}')"
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
+    option_text = db.Column(db.String(200), nullable=False)
+    option_letter = db.Column(db.String(1), nullable=False)
+    is_correct = db.Column(db.Boolean, default=False, nullable=False)
+
+class PromptQuiz(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    prompt = db.Column(db.String(500), nullable=True)
+
+class FileQuiz(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'),nullable=False)
+    file_attachment = db.Column(db.String(255), nullable=True)
 
 class Result(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -101,7 +110,7 @@ class LiveQuiz(db.Model):
     datetime = db.Column(db.DateTime, nullable=False)
     def __repr__(self):
             return f"LiveQuiz('quiz_id:{self.quiz_id}','quiz_code:{self.quiz_code}')"
-    
+
 class QuizAttempts(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     quiz_id = db.Column(db.Integer,db.ForeignKey('quiz.id'), nullable=False)

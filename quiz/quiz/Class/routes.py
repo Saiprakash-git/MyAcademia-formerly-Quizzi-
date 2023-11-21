@@ -10,18 +10,22 @@ from flask import  render_template, redirect, session, url_for, request, flash, 
 @app.route("/addclass", methods=['GET','POST'])
 @login_required
 def add_class(): 
+    print("Current user;::::",current_user.role)
     if request.method == 'POST':
-        form = AddClass() 
-        if form.validate_on_submit(): 
-            classcode = classcode_generator()
-            classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
-            db.session.add(classs)
-            db.session.commit()
-            flash('Class has been created','info')
+        if current_user.role == 'teacher':
+            form = AddClass() 
+            if form.validate_on_submit(): 
+                classcode = classcode_generator()
+                classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
+                db.session.add(classs)
+                db.session.commit()
+                flash('Class has been created','info')
+                return redirect(url_for('home'))
+        else: 
+            flash("Class Can't be Created : As a Student ","info")
             return redirect(url_for('home'))
-        return render_template('addclass.html',form=form)
+    return render_template('addclass.html',form=form)
         
-
 @app.route('/_class/<int:classid>')
 def class_info(classid):
     classinfo = Class.query.get_or_404(classid)
@@ -31,13 +35,6 @@ def class_info(classid):
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
     quizzes = classinfo.quizzes
-    # quizlog = {}  
-    
-    # for quiz in quizzes:
-    #     last_attempt = get_user_attempted_quizzes(user.id, quiz.id)
-    #     if last_attempt:
-    #         quizlog[quiz.id] = last_attempt
-    
     participants = len(ClassStudent.query.filter_by(class_id=classid).all())
     session['participants'] = participants
    

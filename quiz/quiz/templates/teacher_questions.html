@@ -27,7 +27,7 @@
             <h1 style="text-align: center;"> QUESTION {{ session['current_question'] + 1 }} </h1>
 
         </b>
-        <a href="{{ url_for('quiz_detail', quiz_code=quiz.quiz_code) }}" class="btn btn-primary">Quiz Details</a>
+        <a href="{{ url_for('quiz_details', quiz_id=quiz.id) }}" class="btn btn-primary">Quiz Details</a>
 
 
         <form method="POST" id="quiz-form">
