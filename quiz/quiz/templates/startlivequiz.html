@@ -1,16 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<style>  
 
+</style>
     
    
 <div class="quiz-room">
-    <h1>{{ quiztitle }}</h1>
-    <p>Let participants join <p name="quiz_code">{{ livequiz.quiz_code }}</p></p>
-    <small>refresh to see updated content</small>
+    <h1>{{ quiztitle }} - <p name="quiz_code" style="display: inline;">{{ livequiz.quiz_code }}</p></h1>
+
     
-<h4 id="participant_count">{{participants}}</h4>
-<a href="{{url_for('exit_quiz')}}" class="btn btn-primary" id="exitquiz">EXIT</a>
+    <img src="{{url_for('static', filename='participants.png')}}" style="border-radius: 30px;">
+<div id="participant_count"><h4 >{{participants}}</h4></div>
+
   
 
 {% if livequiz.creator_id == current_user.id %}
@@ -18,8 +20,10 @@
     <!-- <input type="text" name="quiz_code" value="{{ quiquiz_code }}" style="display: none;"> -->
     <button type="submit" class="btn btn-primary">Start Quiz</button>
 </form>
-{% endif %}
 
+{% endif %}
+<a href="{{url_for('exit_quiz')}}" class="btn btn-primary" id="exitquiz">EXIT</a> <br>
+<small>refresh to see updated content</small>
 </div>
 
 <div >
@@ -33,13 +37,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script>
-   const socket = io({autoconnect: false}); 
+   const socket2 = io({autoconnect: false}); 
    
   document.addEventListener('DOMContentLoaded', function() {
-    socket.connect(); 
+    socket2.connect(); 
      
   });
-  socket.on('quiz_joined', function(data) {
+  socket2.on('quiz_joined', function(data) {
     
     const participantsFieldset = document.getElementById('participantsFieldset');
     const participantContainer = document.createElement('div');
@@ -61,13 +65,14 @@
     participantContainer.appendChild(participantName);
 
     participantsFieldset.appendChild(participantContainer);
-    document.getElementById('participant_count').innerText = data.participant_count;
-    console.log("count::::"+data.participant_count)
+    // document.getElementById('participant_count').innerText = 
+    var pvalue = parseInt(document.getElementById('participant_count').innerText, 10);
+    pvalue = data.participant_count + 1;
 
-
+    document.getElementById('participant_count').innerText = pvalue;
 
 });
-socket.on('quiz_started', function(data) {
+socket2.on('quiz_started', function(data) {
     const quiz_code = data['quiz_code'];
     const quizUrl = window.location.origin + '/running_quiz/' + quiz_code;
     window.location.href = quizUrl;

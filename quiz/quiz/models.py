@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(7), nullable=False)
     classes_enrolled = db.relationship('Class', backref='students', lazy='dynamic', cascade="all, delete-orphan")
     quizzes = db.relationship('Quiz', backref='user', lazy=True, cascade="all, delete-orphan")
-    quiz_attempts = db.relationship('QuizAttempts', backref='user_attempts', lazy='dynamic', cascade="all, delete-orphan")
+    
     assignments = db.relationship('Assignment', backref='user', lazy=True, cascade="all, delete-orphan")
 
 
@@ -82,7 +82,6 @@ class Option(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     option_text = db.Column(db.String(200), nullable=False)
-    option_letter = db.Column(db.String(1), nullable=False)
     is_correct = db.Column(db.Boolean, default=False, nullable=False)
 
 class PromptQuiz(db.Model):
@@ -95,11 +94,7 @@ class FileQuiz(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'),nullable=False)
     file_attachment = db.Column(db.String(255), nullable=True)
 
-class Result(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    score = db.Column(db.Integer, nullable=False)
+
 
 class LiveQuiz(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -110,13 +105,6 @@ class LiveQuiz(db.Model):
     datetime = db.Column(db.DateTime, nullable=False)
     def __repr__(self):
             return f"LiveQuiz('quiz_id:{self.quiz_id}','quiz_code:{self.quiz_code}')"
-
-class QuizAttempts(db.Model):
-    id = db.Column(db.Integer,primary_key=True)
-    quiz_id = db.Column(db.Integer,db.ForeignKey('quiz.id'), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    quiz_code = db.Column(db.Integer, nullable=False)
-    time = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class QuizLog(db.Model):

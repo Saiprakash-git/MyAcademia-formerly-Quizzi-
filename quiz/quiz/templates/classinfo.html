@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="space"> </div>
+
 <div class="classinfoo">
 <div  >
     <div class="class-info-container">
@@ -39,7 +39,7 @@
                     <span class="close" onclick="closePopup()">&times;</span>
                     <h2>Create Quiz</h2>
                     <button class="quiz-ai-btn" ><a href="{{ url_for('prompt_page')}}">Create with AI Prompt</a></button>
-                    <button class="quiz-txt-btn">Import from Text File</button>
+                    <button class="quiz-txt-btn"><a href="{{ url_for('file_content')}}">Add File <br><small>From file content</small></a></button>
                     <form method="POST" action="{{ url_for('add_livequiz', class_id=classinfo.id) }}" class="form-group">
                         <input type="hidden" name="class_id" value="{{ classinfo.id }}">
                    
@@ -78,7 +78,7 @@
             {% if participants %}
             <div>
                 <p> Participants: {{ participants }}</p>
-                <div class="card">
+                <div class="participants">
                     <ul class="list-group list-group-flush">
                         {% for p in people %}
                             <li class="list-group-item"><img src="{{url_for('static', filename='profiles/participant.png')}}" style="border-radius: 30px;">{{ p.username }}</li>

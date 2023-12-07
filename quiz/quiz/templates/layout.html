@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <title>Quizzi</title>
-   <!-- Required meta tags -->
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-   <!-- Bootstrap CSS -->
+   <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style2.css')}}">
    <style>
     body{ 
       color: #2b3a47;
@@ -35,15 +34,7 @@
       position: relative;
     }
     
-    .svgIcon {
-      width: 12px;
-      transition-duration: 0.3s;
-    }
-    
-    .svgIcon path {
-      fill: white;
-    }
-    
+  
     .button:hover {
       width: 140px;
       border-radius: 50px;
@@ -62,7 +53,7 @@
       position: absolute;
       top: -20px;
       content: "Delete";
-      color: white;
+      color: #11101d;
       transition-duration: 0.3s;
       font-size: 2px;
     }
@@ -73,18 +64,73 @@
       transform: translateY(30px);
       transition-duration: 0.3s;
     }
-    </style>
-    
-  </head>
+    .navbar {
+      background:#ffffff;
+      color: white ;
+      height: 55px;
+      -webkit-font-smoothing: antialiased;
+    text-size-adjust: 100%;
+
+    font-weight: 400;
+
+    -webkit-tap-highlight-color: transparent;
+  
+    border-bottom: 0.0625rem solid #e0e0e0;
+
+    line-height: 1.7em;
+    position: fixed;
+    top: 0;
+
+    width: 100%;
+    z-index: 986;
+
+    }
+
+    .sidebar {
+      margin-top: 55px; /* Adjust this margin to make space for the navbar */
+    }
+    .card {
+      border-radius: 10px;
+background: #ffffff;
+
+border-color: grey;
+ margin: 20px 20px 0 20px; 
+ padding: 20px;
+  width: 300px;
+  height: 180px;
+
+
+    }
+
+/* Add space between the card and sidebar/navbar */
+.space {
+  height: 50px; /* Adjust the height as needed */
+  background: transparent; /* Optionally, set a background color */
+  width: 20px;
+}
+
+  hr{ 
+    color:aliceblue
+  }
+  a{ 
+    color: #11101d;
+  }
+  a :hover{ 
+    color: #11101d;
+  }
+  #joinQuizModal{z-index: 2050;}
+  </style>
+</head>
 <body>
-<header class="site-header">
-  <div class="overlay" id="overlay" onclick="closeQuizModal()"> </div>
-    <nav class="navbar navbar-expand-lg navbar-light custom-light" id="navbar" >
-          {% if current_user.is_authenticated %}
-          <a class="navbar-brand" href="{{url_for('home')}}">Quizzi</a>
-          {% else %}
-          <a class="navbar-brand" href="{{url_for('login')}}">Quizzi</a>
-          {% endif %}
+  
+  
+  <nav class="navbar navbar-expand-lg navbar-light custom-light" id="navbar">
+    <div class="overlay" id="overlay" onclick="closeQuizModal()"> </div>
+    {% if current_user.is_authenticated %}
+    
+    <i class='bx bx-menu' id="btn" style="font-size: 30px; padding: 10px; color: #11101d;"></i>
+    <div class="logo_name"><a  href="{{url_for('home')}}" style=" font-size: 20px; color: #11101d;">Quizzi</a></div>
+    
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -92,21 +138,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
            
-            {% if current_user.is_authenticated %}
-            <li class="nav-item active">
-              <a class="nav-link" href="{{ url_for('home') }}">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="{{ url_for('logout') }}" tabindex="-1" aria-disabled="true">logout</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="{{ url_for('account') }}" tabindex="-1" aria-disabled="true">Account</a>
-            </li>
-            <li class="nav-item"><a class="nav-link "tabindex="-1" aria-disabled="true">{{ current_user.username}}</a></li>
+           
+           
             
             <li ><!-- Add this button to your HTML where you want the + symbol -->
-              <div class="btn-group" style=" margin-left: 730px; margin-right: 10px;">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <div class="btn-group" style=" margin-left: 1170px; ">
+                <button type="button"  class="btn btn dropdown-toggle"   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     +
                 </button>
                 <div class="dropdown-menu" >
@@ -117,100 +154,138 @@
                         <button type="submit" class="dropdown-item" id="create">Join Class</button>
                     </form>
                     
-                     
-  
-                     
                 </div>
             </div>
               </li>
-              <li>
-            <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-          </div>
-        </li>
+              <li class="nav-item" style=" margin-left:30px; display: inline; flex-direction: row;">
+                <button class="btn btn-outline my-2 my-sm-0" id="joinquiznav" type="submit" data-toggle="modal" data-target="#joinQuizModal">
+                  Join quiz
+                </button>
+              </li>
+              
+        </nav>
+        
+
+<div class="sidebar open">
+  <ul class="nav-list">
+    
+    <li>
+      <a href="{{ url_for('home') }}">
+        <i class='bx bx-grid-alt'></i>
+        <span class="links_name">Home</span>
+    </a>
+    <span class="tooltip">Home</span>
+    </li>
+
+   
+    <li>
+      <a href="{{ url_for('account') }}">
+        
+        <i class='bx bx-user-pin'></i>
+        <span class="links_name">Account</span>
+      </a>
+      <span class="tooltip">Account</span>
+    </li>
+  
+  
+    <li>
+      <a href="{{url_for('library')}}">
+        <i class='bx bx-cog'></i>
+        <span class="links_name">Library</span>
+      </a>
+      <span class="tooltip">Library</span>
+    </li>
+   
+    <li class="profile">
+      <div class="profile-details">
+        <div class="name_job">
+          <div class="name">{{ current_user.username}}</div>
+        </div>
+      </div>
+      <a  href="{{ url_for('logout') }}"><i class='bx bx-log-out' id="log_out"></i></a>
+    </li>
+  </ul>
+</div>
+
+
             {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('register') }}">register</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="{{ url_for('login') }}" tabindex="-1" aria-disabled="true">Login</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('about') }}">About us</a>
-            </li>
-            {% endif %}
-            
+    <div class="logo_name"><a  href="{{url_for('login')}}">Quizzi</a></div>
+   
+        
+    </div>
+  
+           
           </ul>
         
-      </nav>
-      
-    
-      <main role="main" id="layout" class="container">
-        <div class="row">
-          <div class="col-md-8">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                  {{message}}
-                </div>
-                {% endfor %}
-              {% endif %}
-            {% endwith %}
-            {% block content %}{% endblock %}
+</nav>
+
+{% endif %}
+<section class="home-section">
+  <div class="space"></div>
+  <main role="main" id="layout" class="container" style="max-width: 100%;">
+    <div class="row">
+      <div class="col-md-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+              {{message}}
             </div>
-            </div>
-            </main>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        </div>
+        </div>
+        
+        </main>
+  
+  <div class="text"> </div>
+  
+</section>
+{% if current_user.is_authenticated %}
+<div class="modal fade" id="joinQuizModal" tabindex="-1" role="dialog" aria-labelledby="joinQuizModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="joinQuizModalLabel">Join Quiz</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+              <!-- Form for entering quiz code -->
+              <form id="joinQuizForm" method="POST" onsubmit="joinQuiz(); return false;">
+                  <div class="form-group">
+                      <label for="quizCode">Enter Quiz Code:</label>
+                      <input type="number" class="form-control" id="quiz_code" name="quiz_code" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="joinquizbtn">Join Now</button>
+              </form>
+          </div>
+      </div>
+  </div>
+</div>  {% endif %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+  const socket = io({autoconnect: false}); 
 
-
-
-   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const deleteLinks = document.querySelectorAll('.delete-class');
-      deleteLinks.forEach(link => {
-        link.addEventListener('click', function (event) {
-          event.preventDefault();
-          const classId = link.getAttribute('data-classid');
-          if (confirm('Are you sure you want to delete this class?')) {
-            window.location.href = `/delete_class/${classId}`;
-          }
-        });
-      });
-    });
-
-// Function to open the modal
-function openQuizModal() {
-  const quizModal = document.getElementById('quizModal');
-  const overlay = document.getElementById('overlay');
-  quizModal.style.display = 'block';
-  overlay.style.display = 'block';
-}
-
-// Function to close the modal
-function closeQuizModal() {
-  const quizModal = document.getElementById('quizModal');
-  const overlay = document.getElementById('overlay');
-  quizModal.style.display = 'none';
-  overlay.style.display = 'none';
-}
-
-// Close the modal if the dimmed background is clicked
-window.addEventListener('click', (event) => {
-  const quizModal = document.getElementById('quizModal');
-  const overlay = document.getElementById('overlay');
-  if (event.target === overlay) {
-    closeQuizModal(); // Call the close function
-  }
+document.addEventListener('DOMContentLoaded', function() {
+  socket.connect(); 
+});
+socket.on('user', function(data){ 
+  console.log("User connected:"+data['username'])
+})
+btn = document.getElementById('joinquizbtn');
+  btn.addEventListener('click' , function()  { 
+    quiz_code = document.getElementById('quiz_code').value; 
+  socket.emit('user_join')
 });
 
-
-    
-  </script>
-  
+</script>
 </body>
 </html>

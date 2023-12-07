@@ -19,16 +19,12 @@ function toggleDropdown() {
 }
 let sidebar = document.querySelector(".sidebar");
 let closeBtn = document.querySelector("#btn");
-let searchBtn = document.querySelector(".bx-search");
+
 closeBtn.addEventListener("click", () => {
   sidebar.classList.toggle("open");
   menuBtnChange(); //calling the function(optional)
 });
-searchBtn.addEventListener("click", () => {
-  // Sidebar open when you click on the search iocn
-  sidebar.classList.toggle("open");
-  menuBtnChange(); //calling the function(optional)
-});
+
 // following are the code to change sidebar button(optional)
 function menuBtnChange() {
   if (sidebar.classList.contains("open")) {
@@ -38,5 +34,49 @@ function menuBtnChange() {
   }
 }
    
+
+document.addEventListener('DOMContentLoaded', function () {
+  const deleteLinks = document.querySelectorAll('.delete-class');
+  deleteLinks.forEach(link => {
+    link.addEventListener('click', function (event) {
+      event.preventDefault();
+      const classId = link.getAttribute('data-classid');
+      if (confirm('Are you sure you want to delete this class?')) {
+        window.location.href = `/delete_class/${classId}`;
+      }
+    });
+  });
+});
+
+
+function openQuizModal() {
+const quizModal = document.getElementById('quizModal');
+const overlay = document.getElementById('overlay');
+quizModal.style.display = 'block';
+overlay.style.display = 'block';
+}
+
+// Function to close the modal
+function closeQuizModal() {
+const quizModal = document.getElementById('quizModal');
+const overlay = document.getElementById('overlay');
+quizModal.style.display = 'none';
+overlay.style.display = 'none';
+}
+
+// Close the modal if the dimmed background is clicked
+window.addEventListener('click', (event) => {
+const quizModal = document.getElementById('quizModal');
+const overlay = document.getElementById('overlay');
+if (event.target === overlay) {
+closeQuizModal(); // Call the close function
+}
+});
+
+
+
+
+
+
 
 

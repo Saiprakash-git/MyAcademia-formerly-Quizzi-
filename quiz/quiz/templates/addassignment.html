@@ -31,7 +31,7 @@
                 {% endfor %}
             {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">{{ form.submit }}</button>
+        {{ form.submit(class="btn btn-primary") }}
     </form>
 </div>
 {% endblock %}

@@ -5,32 +5,34 @@ from quiz.utils import classcode_generator, get_people
 from flask_login import  current_user, logout_user, login_required
 from flask import  render_template, redirect, session, url_for, request, flash,  request
 
-
-
 @app.route("/addclass", methods=['GET','POST'])
 @login_required
 def add_class(): 
-    print("Current user;::::",current_user.role)
     if request.method == 'POST':
         if current_user.role == 'teacher':
-            form = AddClass() 
-            if form.validate_on_submit(): 
-                classcode = classcode_generator()
-                classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
-                db.session.add(classs)
-                db.session.commit()
-                flash('Class has been created','info')
+            try:
+                form = AddClass() 
+                if form.validate_on_submit(): 
+                    classcode = classcode_generator()
+                    check = Class.query.filter_by(class_code=classcode).first() 
+                    if check: 
+                        classcode= classcode_generator()
+                    classs = Class(username=current_user.username ,class_name=form.classname.data,class_code=classcode, creator_id=current_user.id, user_id=current_user.id)
+                    db.session.add(classs)
+                    db.session.commit()
+                    flash('Class has been created','info')
+                    return redirect(url_for('home'))
+                else: 
+                    flash("Class Can't be Created : As a Student ","info")
                 return redirect(url_for('home'))
-        else: 
-            flash("Class Can't be Created : As a Student ","info")
-            return redirect(url_for('home'))
+            except Exception:
+                flash("An Error Occured, Try Again",'danger')
     return render_template('addclass.html',form=form)
         
 @app.route('/_class/<int:classid>')
 def class_info(classid):
     classinfo = Class.query.get_or_404(classid)
     session['current_classid'] = classinfo.id
-    print(session.get('current_classid'))
     user = User.query.filter_by(username=classinfo.username).first()
     assignments = Assignment.query.filter_by(class_id=classinfo.id).all()
     userassigns = user.assignments
@@ -69,7 +71,7 @@ def join_class():
                 else:
                     flash('You are already enrolled in this class', 'info')
             else:
-                flash('Class with the provided code not found or you do not have student access', 'danger')
+                flash('Class with the provided code not found ', 'danger')
             
             return redirect(url_for('home'))
         return render_template('joinclass.html',form=form)
@@ -83,5 +85,17 @@ def exit_class(user_id, class_id):
     db.session.commit()
     return redirect(url_for('home'))
 
-# @app.route('/delete_class/')
-# def 
+@app.route('/delete_class/<int:class_id>')
+@login_required
+def delete_class(class_id):
+    class_to_delete = Class.query.get(class_id)
+    if class_to_delete and current_user.id == class_to_delete.creator_id:
+        ClassStudent.query.filter_by(class_id=class_id).delete()
+        db.session.delete(class_to_delete)
+        db.session.commit()
+
+        flash('Class and associated data have been successfully deleted.', 'success')
+    else:
+        flash('You do not have permission to delete this class.', 'danger')
+
+    return redirect(url_for('home'))

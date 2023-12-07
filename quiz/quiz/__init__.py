@@ -17,7 +17,7 @@ with app.app_context():
     SUBMIT_FOLDER = os.path.join(app.root_path, 'static', 'submits')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOL
     app.config['SUBMIT_FOLDER'] = SUBMIT_FOLDER
- 
+
 
 socketio = SocketIO(app)
 db = SQLAlchemy(app)

@@ -1,19 +1,18 @@
 import os
 import PyPDF2
 from docx import Document
-from flask_socketio import emit, join_room
 from quiz import app,db,socketio
-from quiz.models import Class, PromptQuiz,Quiz,Option, Question, LiveQuiz, QuizLog, User, QuizAttempts,QuizResult
-from quiz.forms import AddQuizForm, AddLiveQuizForm
+from quiz.models import Class, PromptQuiz,Quiz,Option, Question, QuizLog, User,QuizResult
+from quiz.forms import AddLiveQuizForm
 from flask_login import  current_user, login_required
-from quiz.utils import generate_from_file, quizcode_generator , live_quizcode_generator, generate_quiz_content, generate_quiz_title
+from quiz.utils import generate_from_file,  live_quizcode_generator, generate_quiz_content
 from flask import render_template, redirect, url_for, request, flash, session ,Response
 from random import shuffle
 from datetime import datetime, timedelta
 import re
 import random
 
-
+import threading
 count = 0 
 student_details = []
 participants_in_quiz = []
@@ -23,51 +22,53 @@ def getParticipants(quiz_id):
     participants_in_quiz = [student for student in student_details if student['quiz_id'] == quiz_id]
     return participants_in_quiz
 
-@app.route('/quiz/<int:class_id>', methods=['POST', 'GET'])
+@app.route('/addquiz/<int:class_id>', methods=['POST', 'GET'])
 def add_livequiz(class_id):
     form = AddLiveQuizForm()
     quiz_code = live_quizcode_generator()
+    check = Quiz.query.filter_by(quiz_code=quiz_code).first() 
+    if check: 
+        quiz_code= live_quizcode_generator()
+    try:
+        if request.method == 'POST' and form.validate_on_submit():
+            num_questions = form.num_questions.data
+            quiz = Quiz(
+                quiz_code=quiz_code,
+                class_id=class_id,
+                title=form.title.data,
+                timer=form.timer.data,
+                creator_id=current_user.id,
+                datetime=datetime.now()
+            )
+            session['livequiztitle'] = form.title.data
+            db.session.add(quiz)
+            db.session.commit()
 
-    if request.method == 'POST' and form.validate_on_submit():
-        num_questions = form.num_questions.data
-        quiz = Quiz(
-            quiz_code=quiz_code,
-            class_id=class_id,
-            title=form.title.data,
-            timer=form.timer.data
-        )
-        session['livequiztitle'] = form.title.data
-        db.session.add(quiz)
-        db.session.commit()
+            for i in range(num_questions):
+                question_text = request.form.get(f'question_{i + 1}')
+                if question_text:
+                    question = Question(quiz_id=quiz.id, text=question_text)
+                    db.session.add(question)
+                    db.session.commit()
 
-        for i in range(num_questions):
-            question_text = request.form.get(f'question_{i + 1}')
-            if question_text:
-                question = Question(quiz_id=quiz.id, text=question_text)
-                db.session.add(question)
-                db.session.commit()
+                    for j in range(1, 5):
+                        option_text = request.form.get(f'question_{i + 1}_option_{j}')
+                        if option_text:
+                            is_correct = (j == 4)  # Assuming 4th option is the correct one
+                            option = Option(
+                                question_id=question.id,
+                                quiz_id=quiz.id,
+                                option_text=option_text,
+                                is_correct=is_correct
+                            )
+                            db.session.add(option)
+                            db.session.commit()
 
-                options = []
-                for j in range(1, 5):
-                    option_text = request.form.get(f'question_{i + 1}_option_{j}')
-                    if option_text:
-                        option_letter = string.ascii_uppercase[j - 1]
-                        is_correct = (option_letter == request.form.get(f'question_{i + 1}_correct_option'))
-                        option = Option(
-                            question_id=question.id,
-                            quiz_id=quiz.id,
-                            option_text=option_text,
-                            option_letter=option_letter,
-                            is_correct=is_correct
-                        )
-                        db.session.add(option)
-                        db.session.commit()
-
-        
-        return render_template('startorlater.html', quiz_id=quiz.id)
+            return render_template('startorlater.html', quiz_id=quiz.id)
+    except Exception:
+        flash("An Error Occured, Try appropriately",'danger')
 
     return render_template('addLivequiz.html', form=form, class_id=class_id)
-
 
 @app.route('/start_live_quiz/<int:quiz_id>', methods=['GET','POST'])
 def start_live_quiz(quiz_id):
@@ -84,6 +85,10 @@ def start_live_quiz(quiz_id):
 def join_quiz(quiz_code):
     username = session['current_user']['username']
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
+    existing_participation = QuizResult.query.filter_by(quiz_id=quiz.id, student_id=current_user.id).first()
+
+    
+
     if quiz!= None :
         session['current_quiz'] = {
             'quiz_id': quiz.id,
@@ -98,133 +103,139 @@ def join_quiz(quiz_code):
         flash("No Quiz Found",'danger')
         return redirect(url_for('home'))
     
-
 @socketio.on('user_join')
 def handle_join():
     quiz_id = session.get('quiz_id')
-    print("Quiz ID from session:", quiz_id)  
     global student_details
-    for student in student_details:
-        print("Student:", student)
-    print("Cunt value: ",count)
-    participants = len([student for student in student_details if student['quiz_id'] == quiz_id])
-    print("Participants:", participants)  
+    participants = len([student for student in student_details if student['quiz_id'] == quiz_id]) 
+
     socketio.emit('quiz_joined', {"username": current_user.username, "participant_count": participants})
+
+
 
 @app.route('/exit_quiz')
 def exit_quiz():
-    student_details.clear()
-    current_running.clear()
-    
+    username = session['current_user']['username']
+
+    index_to_remove = None
+    for i, student in enumerate(student_details):
+        if student['username'] == username:
+            index_to_remove = i
+            break
+    if index_to_remove is not None:
+        student_details.pop(index_to_remove)
+
     return redirect(url_for('home'))
 
 #prompt generated
 import re
-def separate_questions_options_and_correct(content):
+def parse_question_content(content):
+
+    content = content.replace("Question ", "").strip().split(':', 1)[1].strip()
+
     lines = content.split('\n')
-    questions = []
+    question = lines[0].strip()
     options = []
-    correct_options = []
-    current_question = ""
-    current_options = []  # New variable to store the options for the current question
-    current_correct_option = ""
-    for line in lines:
-        print(f"Processing line: {line}")
-        if line.strip().endswith('?'):  # Identify the line as a question if it ends with '?'
-            if current_question:
-                questions.append(current_question.strip())
-                options.append(current_options)  # Append the options for the current question
-                correct_options.append(current_correct_option.strip())
-            current_question = line.strip()[:-1]  # Remove the trailing '?' to get the question
-            current_options = []  # Reset the options for the new question
-            current_correct_option = ""
-        elif line.startswith("Answer:"):
-            current_correct_option = line.split("Answer:")[1].strip()
-        elif line.strip():  # If the line is not empty (ignoring empty lines)
-            current_options.append(line.strip())  # Append the line to the options list for the current question
+    for line in lines[1:]:
+        # Check if the line starts with an option format
+        if line.strip().startswith(('a)', 'b)', 'c)', 'd)')):
+            option_text = line.split(') ', 1)[1].strip()
+            options.append(option_text)
 
-    if current_question:
-        questions.append(current_question.strip())
-        options.append(current_options)
-        correct_options.append(current_correct_option.strip())
+    # Extract correct answer and remove the lettering
+    correct_answer = lines[-1].replace("Answer: ", "").split(') ', 1)[1].strip()
 
-    return questions, options, correct_options
+    return question, options, correct_answer
 
+def parse_quiz_content(quiz_content):
+    
+    lines = quiz_content.split('\n')
+
+    # Extract the quiz title from the first line
+    quiz_title = lines[0].strip()
+
+    questions_content = quiz_content.split('Question ')[1:]
+
+    # Initialize lists to store parsed questions, options, and correct answers
+    questions = []
+    options_list = []
+    correct_answers = []
+
+    for question_content in questions_content:
+        # Parse each question
+        question, options, correct_answer = parse_question_content(question_content)
+        
+        questions.append(question)
+        options_list.append(options)
+        correct_answers.append(correct_answer)
+
+    return quiz_title ,questions, options_list, correct_answers
 
 @app.route('/prompt', methods=['GET', 'POST'])
 def prompt_page():
     if request.method == 'POST':
         prompt = request.form['prompt']
+        
         ai_generated_content = generate_quiz_content(prompt)
-        print(ai_generated_content)
-        questions, options, correct_options = separate_questions_options_and_correct(ai_generated_content)
-        # quiz_title = generate_quiz_title(prompt)
-        quiz_title = "Title"
-        print("Questions:", questions)
-        print("Options:", options)
-        print("Correct Options:", correct_options)
-        print("Title:", quiz_title)
+ 
+        quiz_title, questions, options, correct_options = parse_quiz_content(ai_generated_content)
+
         return render_template('generated_quiz.html', questions=questions, options=options, correct_options=correct_options, quiz_title=quiz_title, prompt=prompt)
     return render_template('prompt_page.html')
 
 @app.route('/save_generated_quiz', methods=['POST'])
 def save_generated_quiz():
-    if request.method == 'POST':
-        title = request.form.get("quiz_title")
-        class_id = session.get('current_classid')
-        timer = request.form.get("quiz_timer")
-        prompt = request.form.get("prompt")
-        quiz_code = live_quizcode_generator()
+    try:
+        if request.method == 'POST':
+            title = request.form.get("quiz_title")
+            class_id = session.get('current_classid')
+            timer = request.form.get("quiz_timer")
+            prompt = request.form.get("prompt")
+            quiz_code = live_quizcode_generator()
+            check = Quiz.query.filter_by(quiz_code=quiz_code).first() 
+            if check: 
+                quiz_code= live_quizcode_generator()
 
-        if title is not None and class_id is not None:
-            quiz = Quiz(class_id=class_id, quiz_code=quiz_code, title=title, timer=timer, creator_id=current_user.id, datetime=datetime.now())
-            db.session.add(quiz)
-            db.session.commit()
-            questions = request.form.getlist("questions[]")
-            options = [request.form.getlist(f"options_{i}[]") for i in range(len(questions))]
-            correct_options = request.form.getlist("correct_options[]")
-            print("qs:",questions)
-            print("os:",options)
-            print("cos:",correct_options)
-            for i, question_text in enumerate(questions):
-                question = Question(quiz_id=quiz.id, text=question_text)
-                db.session.add(question)
+            if title is not None and class_id is not None:
+                quiz = Quiz(class_id=class_id, quiz_code=quiz_code, title=title, timer=timer, creator_id=current_user.id, datetime=datetime.now())
+                db.session.add(quiz)
                 db.session.commit()
+                questions = request.form.getlist("questions[]")
+                options = [request.form.getlist(f"options_{i}[]") for i in range(len(questions))]
+                correct_options = request.form.getlist("correct_options[]")
 
-                question_options = options[i]
-                question_id = question.id
+                for i, question_text in enumerate(questions):
+                    question = Question(quiz_id=quiz.id, text=question_text)
+                    db.session.add(question)
+                    db.session.commit()
 
-                # Use a regular expression to extract the option letter or number
-                # correct_option_matches = re.finditer(r'\b([a-zA-Z]+)\)', correct_options[i])
-                # correct_option_values = [match.group(1).strip() for match in correct_option_matches]
-                correct_option_values = correct_options[i]
-                print(f"question_text: {question_text}, correct_options[i]: {correct_options[i]}, correct_option_values: {correct_option_values}")
+                    question_options = options[i]
+                    question_id = question.id
 
-                for j, option_text in enumerate(question_options, start=1):
-                    # Check if the option value is among the correct options
-                    is_correct = option_text in correct_option_values
+                    # Use a regular expression to extract the option letter or number
+                    correct_option_values = correct_options[i]
 
-                    print(f"j: {j}, option_text: {option_text}, is_correct: {is_correct}")
+                    for j, option_text in enumerate(question_options, start=1):
+                        # Check if the option value is among the correct options
+                        is_correct = option_text in correct_option_values
 
-                    option = Option(
-                        question_id=question_id,
-                        quiz_id=quiz.id,
-                        option_text=option_text,
-                        option_letter=chr(ord('A') + j - 1),
-                        is_correct=is_correct
-                    )
-                    db.session.add(option)
+                        option = Option(
+                            question_id=question_id,
+                            quiz_id=quiz.id,
+                            option_text=option_text,
+                            is_correct=is_correct
+                        )
+                        db.session.add(option)
+                    db.session.commit()
+
+                quizprompt = PromptQuiz(quiz_id=quiz.id, prompt=prompt)
+                db.session.add(quizprompt)
+
+                # Consolidate commits
                 db.session.commit()
-                
-            quizprompt = PromptQuiz(quiz_id=quiz.id, prompt=prompt)
-            db.session.add(quizprompt)
-
-            # Consolidate commits
-            db.session.commit()
-            return render_template('startorlater.html', quiz_id=quiz.id)
-        else:
-            print("Title or class_id was NONE")
-
+                return render_template('startorlater.html', quiz_id=quiz.id)
+    except Exception:
+        flash("An Error Occured, Try Again",'danger')
     return redirect(request.referrer)
 
 #File quiz
@@ -257,81 +268,33 @@ def extract_text_from_txt(txt_file_path):
 
 @app.route('/file_content', methods=['GET', 'POST'])
 def file_content():
-    if request.method == 'POST':
-        uploaded_file = request.files['file']
-        instructions = request.form['instructions']
-        f_content = ""
-        if uploaded_file.filename != '':
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
-            uploaded_file.save(file_path)
-        extension = get_file_extension(file_path)
+    try:
+        if request.method == 'POST':
+            uploaded_file = request.files['file']
+            instructions = request.form['instructions']
+            f_content = ""
+            if uploaded_file.filename != '':
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_file.filename)
+                uploaded_file.save(file_path)
+            extension = get_file_extension(file_path)
 
-        if extension == '.pdf':
-            f_content = extract_text_from_pdf(file_path)
-        elif extension == '.docx':
-            f_content = extract_text_from_docx(file_path)
-        elif extension == '.txt':
-            f_content = extract_text_from_txt(file_path)
-        else:
-            flash('File type not supported','danger')
-            return render_template('file_page.html')
-        quiz_content = generate_from_file(f_content)
-        questions, options, correct_options = separate_questions_options_and_correct(quiz_content)
-        return render_template('generated_quiz.html', questions=questions, options=options, correct_options=correct_options)
+            if extension == '.pdf':
+                f_content = extract_text_from_pdf(file_path)
+            elif extension == '.docx':
+                f_content = extract_text_from_docx(file_path)
+            elif extension == '.txt':
+                f_content = extract_text_from_txt(file_path)
+            else:
+                flash('File type not Allowed','danger')
+                return render_template('file_page.html')
+            f_content = f_content+instructions
+            quiz_content = generate_from_file(f_content)
+            quiz_title, questions, options, correct_options = parse_quiz_content(quiz_content)
+            return render_template('generated_quiz.html',quiz_title=quiz_title, questions=questions, options=options, correct_options=correct_options)
+    except Exception as e:
+        flash("An Error Occured :Check file Content , Try again",'danger')
     return render_template('file_page.html')
 
-
-# @app.route('/running_quiz/<int:quiz_code>', methods=['GET','POST'])
-# def running_quiz(quiz_code):
-#     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
-#     if quiz is None:
-#         return "Invalid quiz code"
-#     socketio.emit('quiz_started',{'quiz_code':quiz_code})
-#     question = quiz.questions
-#     import random
-#     questions = list(question)
-#     random.shuffle(questions)
-#     # Initialize the session variables for storing the current question index and the score
-#     if 'current_question' not in session:
-#         session['current_question'] = 0
-#     if 'score' not in session:
-#         session['score'] = 0
-    
-#     # Check if the user has submitted an answer
-#     if request.method == 'POST':
-#         print("fromm consollllleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-#         # Get the user's answer from the form
-#         answer = request.form.get('answer')
-#         # Get the correct answer from the database
-#         correct_answer = questions[session['current_question']].options[0].option4 # Assuming option1 is always correct
-#         # Compare the user's answer with the correct answer and update the score accordingly
-#         if answer == correct_answer:
-#             session['score'] += 1
-#         # Increment the current question index by 1	
-#         session['current_question'] += 1
-#     # Check if there are more questions left
-#     if session['current_question'] < len(questions):
-#         # Get the current question object
-#         question = questions[session['current_question']]
-#         # Get the options for the current question
-#         if question.options:
-#             options = question.options[0]
-#         else:
-#              options = None
-        
-#         # Render the quiz template with the quiz, question, and options data
-#         return render_template('question_template.html', quiz=quiz, question=question, options=options, timer=quiz.timer)
-    
-#     else:
-#         result = session['score']
-#         # Reset the session variables
-#         session.pop('current_question')
-#         session.pop('score')
-#         # Render a message to indicate that the quiz is over
-#         # quizlog = QuizLog(quiz_id=quiz.id,student_id=current_user.id,entered_answer=answer, correct_answer=correct_answer, total_marks=result)
-#         # db.session.add(quizlog)
-#         # db.session.commit()
-#         return render_template("quizresult.html",result=result)
 
 @app.route('/running_quiz/<int:quiz_code>', methods=['GET','POST'])
 def running_quiz(quiz_code):
@@ -351,7 +314,6 @@ def running_quiz(quiz_code):
     question = quiz.questions
     questions = list(question)
     random.shuffle(questions)
-    print(questions)
 
     if 'current_question' not in session:
         session['current_question'] = 0
@@ -362,8 +324,6 @@ def running_quiz(quiz_code):
       else:
 
          answer = request.form.get('selected_answer')
-         print(answer)
-         print(answer)
 
          correct_answer = Option.query.filter_by(
             question_id=questions[session['current_question']].id,
@@ -387,7 +347,7 @@ def running_quiz(quiz_code):
             
             random.seed()
             random.shuffle(l1)
-            print(l1)
+    
 
         else:
              options = None
@@ -398,34 +358,24 @@ def running_quiz(quiz_code):
     
         return render_template( template_name, quiz=quiz, question=question, l1=l1, timer=quiz.timer)
     
-
-        # if user_is_creator:
-        # # Render the quiz template with the quiz, question, and options data
-        #     return render_template( 'teacher_questions.html', quiz=quiz, question=question, l1=l1, timer=quiz.timer)
-        # else:
-        #     return render_template( 'question_template.html', quiz=quiz, question=question, l1=l1, timer=quiz.timer)
     else:
-        print(session.pop('current_question'))
+        
 
         return redirect(url_for('quizresult', quiz_code=quiz_code))
         
-
-
 @app.route('/quizresult/<int:quiz_code>')
 @login_required  # Ensure the user is logged in
 def quizresult(quiz_code):
-    # Retrieve the quiz object
+
     quiz = Quiz.query.filter_by(quiz_code=quiz_code).first()
     
-
-    # Check if the quiz exists
     if quiz is None:
         return "Invalid quiz code"
     
     if quiz.creator_id == current_user.id:
         return redirect(url_for('combine_results', quiz_id =quiz.id))
 
-    # Calculate the total marks for the current student
+    
     student_id = current_user.id  # Assuming you have a way to get the current user's ID
     
 
@@ -433,24 +383,17 @@ def quizresult(quiz_code):
     
     total_marks = 0
 
-   # Initialize total_marks outside the loop
+
     for quiz_log in quiz_logs:
-
         if quiz_log.entered_answer == quiz_log.correct_answer:
-            total_marks += 1  # Increment total_marks when the condition is met
+            total_marks += 1 
 
-    print(total_marks)   # Initialize total_marks outside the loop
- # This will print the total number of correct answers
 
-    
-    # Create a new entry in the results table
     quiz_result = QuizResult(quiz_id=quiz.id, student_id=student_id, total_marks=total_marks)
     db.session.add(quiz_result)
     db.session.commit()
-
     # You can also query and display the results for the current student
     student_results = QuizResult.query.filter_by(student_id=student_id).all()
-
     return render_template('quizresult.html', result=quiz_result, total_marks=total_marks, student_results=student_results)
 
 @app.route('/combine_results/<int:quiz_id>')
@@ -503,7 +446,6 @@ def teacher_dashboard(class_id):
 
     # Determine the number of quizzes for which you want to calculate the average
     num_quizzes_to_use = len(quizzes)
-
 
     for quiz in quizzes:
         quiz_id = quiz.id
@@ -588,25 +530,13 @@ def delete_quiz(quiz_id):
     return redirect(url_for('class_info', classid=classid))
 
 
-@app.route('/quiz/<int:quiz_id>/results')
-def quiz_result(quiz_id): 
-    return ''
 
 
-# Function to parse AI-generated quiz content into questions and options
-def parse_ai_generated_quiz(quiz_content):
-    questions_and_options = re.split(r'[A-D]\.', quiz_content)  # Split on A., B., C., D.
-    
-    questions = []
-    options = []
 
-    for segment in questions_and_options:
-        segment = segment.strip()
-        if segment:
-            if segment[0].isalpha():  
-                options.append(segment)
-            else:   
-                questions.append(segment)
-    print("question:",questions)
-    print("options:",options)
-    return questions, options, questions_and_options
+@app.route('/quiz/<int:quiz_id>')
+@login_required
+def view_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    return render_template('quiz_content.html', quiz=quiz)
+
+

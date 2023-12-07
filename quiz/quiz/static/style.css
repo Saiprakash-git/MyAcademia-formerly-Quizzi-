@@ -1,8 +1,28 @@
-/* .container{ 
-  max-width: 100%;
+*{ 
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
- */
 
+#bottone1 {
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-bottom: 12px;
+  padding-top: 12px;
+  border-radius: 9px;
+  background: #b49bf1;
+
+  
+  text-align: center;
+  cursor: pointer;
+  transition: 0.4s;
+ }
+ 
+ 
+ 
+ #bottone1:active {
+  transform: scale(0.97);
+  box-shadow: 7px 5px 56px -10px #7df381;
+ }
  hr {color: black;
   height: 1px;
     background: black;}
@@ -31,12 +51,11 @@ max-width: 50%;
   overflow: hidden;
   background-color: #fff;
   position: fixed;
-  top: 50px;
-  right: 60px; 
+  
   padding: 10px; 
   border: 1px solid #ccc;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-  z-index: 999; 
+
 }
 
 #uploadassignment{ 
@@ -54,8 +73,31 @@ max-width: 50%;
 }
 
 .mini-navbar {
-  background-color:#fff; /* Navbar background color */
-  padding: 10px;
+  display: flex;
+  
+  
+  border-radius: 5px; /* Rounded corners */
+  overflow: hidden; /* Hide overflow content */
+  max-height: 100%;
+  margin-top: 3px;
+}
+
+.mini-navbar a {
+  padding: 10px 15px; /* Add padding for better spacing */
+  text-decoration: none;
+  color: #333; /* Text color */
+  font-weight: bold;
+  transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+.mini-navbar a:hover {
+  background-color: #e0e0e0; /* Light gray background color on hover */
+}
+
+.mini-navbar hr {
+  border-color: #e0e0e0; /* Light border color for hr */
+  margin-top: 5px; /* Add some space above hr */
+  margin-bottom: 0; /* Remove default margin below hr */
 }
 
 /* Style for the navigation links */
@@ -117,8 +159,9 @@ max-width: 50%;
     margin-top: 20px;
     padding: 2px;
     overflow: hidden;
+
   }
- 
+  .card
   .custom-row {
     /* Your custom row styles here */
     display: flex;
@@ -178,6 +221,7 @@ max-width: 50%;
     }
 
     .quiz-ai-btn a{ color: white;}
+    .quiz-txt-btn a{ color: white;}
     .quiz-ai-btn:hover,
     .quiz-txt-btn:hover {
         background-color: #0056b3; /* Darker blue on hover */
@@ -196,12 +240,39 @@ max-width: 50%;
     margin: 10px;
     /* Adjust width and margin as needed */
 }
+/* Add this to your existing style.css or create a new one */
+#sidebar {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  
+  left: -250px;
+  background-color: #343a40;
+  padding-top: 50px;
+  transition: 0.5s;
+  
+}
+
+#sidebar.active {
+  left: 0;
+}
+
+#sidebar ul {
+  padding: 0;
+  list-style: none;
+}
+
+#sidebar ul li {
+  padding: 8px;
+  font-size: 18px;
+}
 
  
   .classdd {
  
     position: fixed;
-    /* Ensure it appears above other elements */
+
     cursor: pointer;
     display: inline-block;
 }
@@ -212,6 +283,7 @@ max-width: 50%;
     border: none;
     font-size: 24px;
     cursor: pointer;
+    margin-left: 5%;
 }
 
 /* Style for the dropdown content */
@@ -221,7 +293,7 @@ max-width: 50%;
     background-color: #fff;
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
+
 }
 
 /* Style for the dropdown content links */
@@ -254,6 +326,7 @@ max-width: 50%;
     background-color: #f8f5f5;
   }
   
+ 
   .content-section {
     background: #ffffff;
     padding: 10px 20px;
@@ -310,7 +383,7 @@ max-width: 50%;
   }
 
   #navbar { 
-   background-color: #f0f0f5;
+   background-color: #ffffff;
   color: white;
   }
 
@@ -346,31 +419,31 @@ label{
   width: 300px; /* Adjust the width as needed */
 }
 
-.overlay {
+.centered-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: none;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Set a high value for z-index */
+}
+
+.overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 999; /* Set a value lower than the modal z-index */
 }
 
-/* Styles for the centered card */
-.centered-card {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  padding: 20px;
-  background-color: #fff; /* Card background color */
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-  z-index: 3;
-}
 
 .quiz-modal-content{ 
   max-width: 90%;
@@ -384,7 +457,7 @@ label{
 }
 
 body {
-  font-family: Arial, sans-serif;
+  
   background-color: #fff;
 
   padding: 0;
@@ -392,19 +465,20 @@ body {
 }
 
 .participants{
-  margin-left: 20px; 
+  display: inline;
+  margin-left: 70px; 
   max-width: 30%;
+  border-radius: 10px ;
 }
 .quiz-room {
   text-align: center;
   margin: 20px auto;
   left: 10px;
-
   padding: 20px;
   background-color: #fff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
+  max-width: 80%;
 }
 
 h1 {

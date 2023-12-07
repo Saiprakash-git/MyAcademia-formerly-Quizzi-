@@ -4,7 +4,6 @@
 
 <style>
    .joinquizbtn {
-    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,14 +63,13 @@
 
     <div class="home"> 
 
-
-    <div class="row">
-      <div class="col-md-6">
-          {% for classs in created_classes %}
-          
-              <div class="col-md-10">
-                  <div class="class-card">
-                      <div class="card">
+      <div class="row">
+     
+        {% for classs in created_classes %}
+        
+        <div class="col-md-5">
+                <div class="class-card">
+                    <div class="card">
                           <div class="card-body">
                               <div class="card-title"> 
                                   <h4 style="display: inline-block;">
@@ -95,14 +93,16 @@
                       
                       </div>
                   </div>
-              </div>
+        </div>
           {% endfor %}
       
-  
+      
+            
+        
           {% for classs in joined_classes %}
-          <div class="col-md-10">
-              <div class="class-card">
-                  <div class="card">
+          <div class="col-md-5">
+            <div class="class-card">
+                <div class="card">
                       <div class="card-body">
                           <div class="card-title"> 
                               <h4 style="display: inline-block;">
@@ -128,35 +128,16 @@
       {% endfor %}
         <!-- ... (existing code for classes) ... -->
     </div>
-  
-    <div class="col-md-6">
-        <!-- "Join Quiz" module on the right side at the top -->
-        <form class="form-inline mt-4" id="join_quiz"  method="POST" onsubmit="joinQuiz(); return false;">
-            
-            <h5 style="font-size: 20px;">Have a Quiz? <br><p>Enter Code</p></h5>
-            <div class="d-flex align-items-center" >
-            <input type="number" name="quiz_code" id="quiz_code">
 
-            <br>
-
-            
-<button class="joinquizbtn" id="joinquizbtn" type="submit">
-    joinnow
-  </button>
-</div>
-</form>
-</div>
-
-
-    </div>
 </div>
 </div>
+
 </body>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
-<!-- <script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='sockets.js') }}"></script> -->
-<script> const socket = io({autoconnect: false}); 
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='sockets.js') }}"></script>
+<!-- <script> const socket = io({autoconnect: false}); 
 
   document.addEventListener('DOMContentLoaded', function() {
     socket.connect(); 
@@ -168,8 +149,8 @@
     btn.addEventListener('click' , function()  { 
       quiz_code = document.getElementById('quiz_code').value; 
     socket.emit('user_join')
-  });
-  
-  </script>
+  }); -->
+<!--   
+  </script> -->
 
 {% endblock %}

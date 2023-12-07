@@ -87,15 +87,6 @@ class UpdateAccount(FlaskForm):
         if user:
             raise ValidationError('That email is taken. Please choose a different one.')
 
-class AddQuizForm(FlaskForm):
-    title = StringField('Quiz Title', validators=[DataRequired()])
-    class_id = SelectField('Class', validators=[DataRequired()], coerce=int)
-    timer = IntegerField('Question Timer (seconds)', validators=[DataRequired(), NumberRange(min=1)])
-    num_questions = IntegerField('Number of Questions', validators=[DataRequired(), NumberRange(min=1)])
-    questions = FieldList(StringField('Question'), min_entries=1)
-    options = FieldList(StringField('Option'), min_entries=1)
-    submit = SubmitField('Add Quiz')
-
 class AddLiveQuizForm(FlaskForm):
     title = StringField('Quiz Title', validators=[DataRequired()])
     timer = IntegerField('Question Timer (seconds)', validators=[DataRequired(), NumberRange(min=1)])
@@ -104,15 +95,3 @@ class AddLiveQuizForm(FlaskForm):
     options = FieldList(StringField('Option'), min_entries=1)
     submit = SubmitField('Add Quiz')
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField
-
-class QuestionForm(FlaskForm):
-    question_text = StringField('Question')
-    options = FieldList(StringField('Option'))
-
-class GenerateQuizForm(FlaskForm):
-    title = StringField('Title')
-    timer = IntegerField('Question Timer (seconds)')
-    num_questions = IntegerField('Number of Questions')
-    questions = FieldList(FormField(QuestionForm))
