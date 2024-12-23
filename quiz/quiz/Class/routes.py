@@ -22,11 +22,12 @@ def add_class():
                     db.session.commit()
                     flash('Class has been created','info')
                     return redirect(url_for('home'))
-                else: 
-                    flash("Class Can't be Created : As a Student ","info")
-                return redirect(url_for('home'))
             except Exception:
                 flash("An Error Occured, Try Again",'danger')
+        else: 
+            flash("Class Can't be Created : As a Student ","info")
+            return redirect(url_for('home'))
+            
     return render_template('addclass.html',form=form)
         
 @app.route('/_class/<int:classid>')

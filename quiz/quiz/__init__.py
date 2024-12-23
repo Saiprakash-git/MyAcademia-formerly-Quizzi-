@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
@@ -34,6 +34,15 @@ app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS')
 
 mail = Mail(app)
+
+io = SocketIO(app)
+
+# Add a general exception handler
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # You can log the error here if needed
+    print(f"Exception occurred: {e}")
+    return render_template('Error.html'), 500
 
 from quiz.users import routes
 from quiz.main import routes

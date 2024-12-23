@@ -1,6 +1,6 @@
 import os
 import PyPDF2
-from docx import Document
+# from docx import Document
 from quiz import app,db,socketio
 from quiz.models import Class, PromptQuiz,Quiz,Option, Question, QuizLog, User,QuizResult
 from quiz.forms import AddLiveQuizForm

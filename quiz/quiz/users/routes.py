@@ -10,16 +10,16 @@ users = []
 @app.route("/register", methods=['GET', 'POST'])
 def register(): 
     form = RegistrationForm()
-    try:
-        if form.validate_on_submit():   
+    # try:
+    if form.validate_on_submit():   
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             user = User(username=form.username.data, email=form.email.data, password=hashed_password, role=form.role.data)
             db.session.add(user)
             db.session.commit()
             flash('Your account has been created! You are now able to log in', 'success')
             return redirect(url_for('login'))
-    except Exception:
-        flash("An Error Occured , Try Again",'danger')
+    # except Exception:
+    #     flash("An Error Occured , Try Again",'danger')
     return render_template("register.html",form=form)
 
 
