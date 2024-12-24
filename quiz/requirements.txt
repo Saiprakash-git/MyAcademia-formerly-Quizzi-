@@ -2,10 +2,12 @@ flask_socketio
 flask_sqlalchemy
 flask_bcrypt
 flask_login
+flask
 flask_mail
 PyPDF2
 flask_login
 openai
 flask 
 Document
+gunicorn
 flask_wtf
