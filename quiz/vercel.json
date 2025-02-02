@@ -1,0 +1,15 @@
+{
+    "builds": [
+      {
+        "src": "run.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "quiz/quiz/main.py"
+      }
+    ]
+  }
+  
