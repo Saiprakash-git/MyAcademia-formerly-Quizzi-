@@ -8,7 +8,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "quiz/quiz/main.py"
+        "dest": "quiz/quiz/run.py"
       }
     ]
   }
